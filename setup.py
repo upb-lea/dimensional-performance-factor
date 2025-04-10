@@ -21,7 +21,11 @@ setup(
         'Environment :: MacOS X'
     ],
     description="dimensional-performance-factor",
-    install_requires=[],
+    install_requires=['pandas~=2.2.1',
+                      'numpy~=1.26.0',
+                      'matplotlib~=3.8.0',
+                      'scipy~=1.12.0'
+                      ],
     license="GNU General Public License v3",
 
     # long_description=readme + '\n\n' + history,
