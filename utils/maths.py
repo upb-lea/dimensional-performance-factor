@@ -1,6 +1,8 @@
 import numpy as np
 from scipy.spatial import Delaunay
 
+j = complex(0, 1)
+
 
 def area_from_3_points(x, y, z):
     return np.sqrt(np.sum(np.cross(x-y, x-z), axis=-1)**2)/2

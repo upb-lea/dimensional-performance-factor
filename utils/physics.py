@@ -1,4 +1,6 @@
 import numpy as np
+from scipy.constants import mu_0, epsilon_0
+
 
 def f_pv_mag(f, mu_imag, h_abs):
     return -0.5 * 2 * np.pi * f * mu_imag * h_abs ** 2
