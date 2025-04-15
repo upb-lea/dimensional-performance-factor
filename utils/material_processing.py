@@ -102,5 +102,3 @@ def mu_h_from_df(df_mu, f, T):
         return mu_real_interp_h(h) + j * mu_imag_interp_h(h)
 
     return mu_of_h
-
-
