@@ -49,7 +49,7 @@ def r_h_e_NL(R, f, A, eps: complex, mu_h, n_runs=10):
     permeability = mu_h(H_vals_interpolation)
     k_at_h = 2 * np.pi * f * np.sqrt(permeability * permittivity)
 
-    k_squared_interp = interp1d(np.abs(H_vals_interpolation), k_at_h**2, kind="cubic", fill_value='extrapolate')
+    k_squared_interp = interp1d(np.abs(H_vals_interpolation), k_at_h**2, kind="linear", fill_value='extrapolate')
 
     # Define the ODE system
     def bessel_system(r, y):

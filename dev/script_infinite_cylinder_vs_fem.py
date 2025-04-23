@@ -99,13 +99,13 @@ for i, f in enumerate(fs):
         B_ = mu_h(np.abs(H_)) * H_
 
         # flux
-        flux = integral_2d_axi_symmetryflux_from_b_(r_, B_)
+        flux = integral_2d_axi_symmetry_flux_from_b_(r_, B_)
 
         pv_mag = f_pv_mag(f, mu_h(np.abs(H_)).imag, np.abs(H_))
-        mean_pv_mag = integral_2d_axi_symmetryflux_from_b_(r_, pv_mag) / np.pi / R ** 2
+        mean_pv_mag = integral_2d_axi_symmetry_flux_from_b_(r_, pv_mag) / np.pi / R ** 2
 
         pv_el = f_pv_el(f, eps.imag, np.abs(E_))
-        mean_pv_el = integral_2d_axi_symmetryflux_from_b_(r_, pv_el) / np.pi / R ** 2
+        mean_pv_el = integral_2d_axi_symmetry_flux_from_b_(r_, pv_el) / np.pi / R ** 2
 
         A = A + 0.01
 
@@ -130,7 +130,7 @@ ax[2].set_ylabel(r"$\mu_\mathrm{imag}$")
 ax[3].set_ylabel(r"$E$ / $\frac{\mathrm{V}}{\mathrm{m}}$")
 ax[4].set_ylabel(r"$p_\mathrm{mag}$ / $\frac{\mathrm{kW}}{\mathrm{m³}}$")
 ax[5].set_ylabel(r"$p_\mathrm{el}$ / $\frac{\mathrm{kW}}{\mathrm{m³}}$")
-ax[5].set_xlabel(r"$r$ / m")
+ax[5].set_xlabel(r"$r$ / mm")
 
 ax[0].legend()
 
