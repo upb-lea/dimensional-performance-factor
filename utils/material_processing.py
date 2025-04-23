@@ -77,7 +77,7 @@ def mu_complex_h(b, mu_b_complex):
     :param mu_b_complex: mu(b)
     :return: h_max, mu(h)
     """
-    interpolation_type = "cubic"
+    interpolation_type = "linear"
     # Interpolation with b:
     mu_real_interp_b = interp1d(b, mu_b_complex.real, kind=interpolation_type, fill_value='extrapolate')
     mu_imag_interp_b = interp1d(b, mu_b_complex.imag, kind=interpolation_type, fill_value='extrapolate')

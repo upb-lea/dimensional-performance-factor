@@ -25,8 +25,6 @@ def r_h_e_(R, f, A, eps: complex, mu_of_h, n_runs=10):
     runs = np.arange(0, n_runs)
     for run in runs:
         permeability = mu_of_h(np.abs(H_))
-        print(np.abs(H_))
-        print(permeability)
         k_ = 2 * np.pi * f * np.sqrt(permeability * permittivity)
         H_ = A * special.jv(0, k_ * r_) / special.jv(0, k_ * R)
         E_ = A * k_ / (j * 2 * np.pi * f * permittivity) * special.jv(1, k_ * r_) / special.jv(0, k_ * R)
@@ -79,8 +77,3 @@ def r_h_e_NL(R, f, A, eps: complex, mu_h, n_runs=10):
     return sol.x, H_, E_
 
 
-def flux_from_b_(r_, B_):
-    dr = r_[3] - r_[2]
-    # return complex(trapezoid(2 * np.pi * r_ * B_.real, dx=dr), trapezoid(2 * np.pi * r_ * B_.imag, dx=dr))
-    # return complex(np.trapz(2 * np.pi * r_ * B_.real, r_), np.trapz(2 * np.pi * B_.imag, r_))
-    return np.trapz(2 * np.pi * r_ * B_, r_)

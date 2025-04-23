@@ -7,4 +7,4 @@ with open(os.path.join(os.path.dirname(__file__), 'folders.json'), 'r') as file:
 
 comsol_results = folder_links["comsol_results"]
 material_data = folder_links["material_data"]
-
+grafics = folder_links["grafics"]

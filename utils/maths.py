@@ -19,3 +19,7 @@ def integrate_2d(x, y, f):
         int_f += mean_value * area
 
     return int_f
+
+
+def integral_2d_axi_symmetryflux_from_b_(r_, field_):
+    return np.trapz(2 * np.pi * r_ * field_, r_)
