@@ -20,12 +20,13 @@ fig, ax = plt.subplots(6, figsize=(3.5, 6), sharex=True)
 # --- Comsol
 # --- Magnetic flux density ---
 x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, "MagB_horizontal.txt"), field_name="MagB", R=R)
-# Get global quantities by integration
-magnetic_flux_comsol = 4 * integrate_2d(x=x_B_comsol, y=y_B_comsol, f=np.abs(B_comsol))
-print(f"\nmagnetic_flux = {np.round(magnetic_flux_comsol * 1e6, 3)} µVs (from comsol)")
 # 1d plot in dependency of the radius
 r_B_comsol = np.sqrt(x_B_comsol ** 2 + y_B_comsol ** 2)
-ax[0].plot(1000 * r_B_comsol, B_comsol * 1000, "*", color="tab:grey")
+ax[0].plot(1000*r_B_comsol, B_comsol*1000, "*", color="tab:grey")
+
+# --- Total magnetic flux by numerical integration ---
+magnetic_flux_comsol = 4 * integrate_2d(x=x_B_comsol, y=y_B_comsol, f=np.abs(B_comsol))
+print(f"\nmagnetic_flux = {np.round(magnetic_flux_comsol * 1e6, 3)} µVs (from comsol)")
 
 # --- Electric field ---
 x_E_comsol, y_E_comsol, E_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, "MagE_horizontal.txt"), field_name="MagE", R=R)
