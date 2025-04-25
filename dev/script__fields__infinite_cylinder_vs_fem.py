@@ -148,6 +148,6 @@ fig.align_labels()
 plt.subplots_adjust(wspace=0, hspace=0.1)
 plt.tight_layout()
 
-plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC.pdf"))
-plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC.png"))
+plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC_fields.pdf"))
+plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC_fields.png"))
 plt.show()

@@ -8,6 +8,12 @@ def read_df_from_comsol_3d_plot(link2file, quantity_name: str):
     return df
 
 
+def read_df_from_comsol_table(link2file, header: list):
+    df = pd.read_csv(link2file, sep='\s+', comment="%", skiprows=5, header=None)
+    df.columns = header
+    return df
+
+
 def read_comsol_2d_circle_field(link, field_name, R):
     df = read_df_from_comsol_3d_plot(link2file=link, quantity_name=field_name)
 
