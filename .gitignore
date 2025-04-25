@@ -1,0 +1,12 @@
+# Default ignored files
+
+
+# Directories
+.idea/
+__pycache__/
+dimensional_performance_factor.egg-info
+
+# Files
+meta/folders.json
+
+# General File Types
