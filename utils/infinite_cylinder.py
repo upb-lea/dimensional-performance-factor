@@ -7,7 +7,7 @@ from utils.physics import *
 from utils.maths import *
 
 
-def r_h_e_(R, f, A, eps: complex, mu_of_h, n_runs=10):
+def r_h_e_(R, f, A, eps: complex, mu_of_h, n_runs=5):
     """
 
     :param R:
@@ -22,6 +22,7 @@ def r_h_e_(R, f, A, eps: complex, mu_of_h, n_runs=10):
     r_ = np.linspace(0, R, 50)
     H_LF = np.ones_like(r_) * A
     H_ = H_LF
+    E_ = np.zeros_like(H_)
     runs = np.arange(0, n_runs)
     for run in runs:
         permeability = mu_of_h(np.abs(H_))

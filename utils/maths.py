@@ -21,5 +21,5 @@ def integrate_2d(x, y, f):
     return int_f
 
 
-def integral_2d_axi_symmetry_flux_from_b_(r_, field_):
+def integrate_2d_axi_symmetry_field(r_, field_):
     return np.trapz(2 * np.pi * r_ * field_, r_)

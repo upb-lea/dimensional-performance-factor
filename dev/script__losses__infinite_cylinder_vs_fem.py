@@ -28,8 +28,8 @@ for i, f in enumerate(fs):
 
     # --- Comsol
     # --- Magnetic flux density ---
-    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/MagB_horizontal.txt"), field_name="MagB",
-                                                                          R=R)
+    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/MagB_horizontal.txt"), field_name="MagB",
+                                                                          R=R*1.001)
     # 1d plot in dependency of the radius
     r_B_comsol = np.sqrt(x_B_comsol ** 2 + y_B_comsol ** 2)
 
@@ -55,17 +55,17 @@ for i, f in enumerate(fs):
         B_ = mu_h(np.abs(H_)) * H_
 
         # flux
-        flux = integral_2d_axi_symmetry_flux_from_b_(r_, B_)
+        flux = integrate_2d_axi_symmetry_field(r_, B_)
 
-        A = A + 0.01
+        A = A + 0.005
 
     # Magnetic loss density
     pv_mag = f_pv_mag(f, mu_h(np.abs(H_)).imag, np.abs(H_))
-    mean_pv_mag = integral_2d_axi_symmetry_flux_from_b_(r_, pv_mag) / np.pi / R ** 2
+    mean_pv_mag = integrate_2d_axi_symmetry_field(r_, pv_mag) / np.pi / R ** 2
 
     # Dielectric loss density
     pv_el = f_pv_el(f, eps.imag, np.abs(E_))
-    mean_pv_el = integral_2d_axi_symmetry_flux_from_b_(r_, pv_el) / np.pi / R ** 2
+    mean_pv_el = integrate_2d_axi_symmetry_field(r_, pv_el) / np.pi / R ** 2
 
     # Total loss density and losses
     mean_pv = mean_pv_el + mean_pv_mag
@@ -92,23 +92,23 @@ for i, f in enumerate(fs):
 
 
 # Plot losses from 3D simulation:
-df_Pv_comsol = comsol.read_df_from_comsol_table(link2file=os.path.join(paths.comsol_results, "core losses.txt"),
+df_Pv_comsol = comsol.read_df_from_comsol_table(link2file=os.path.join(paths.comsol_results, "rectangular_conductor_4A/core losses.txt"),
                                                 header=["lam", "i", "f", "T_c", "f2", "P_mag", "P_el", "P_v"])
 ax[0].plot(df_Pv_comsol["f"] / 1000, df_Pv_comsol["P_v"], label=f"3D FEM", color=colors[3])
 
 
 # Plot losses from IC model
-ax[0].plot(np.array(fs) / 1000, Pvs_IC, label=f"IC model", color=colors[0])
-ax[1].plot(np.array(fs) / 1000, (np.array(Pvs_IC)-df_Pv_comsol["P_v"])/df_Pv_comsol["P_v"], label=f"IC model", color=colors[0])
+ax[0].semilogy(np.array(fs) / 1000, Pvs_IC, label=f"IC model", color=colors[0])
+ax[1].plot(np.array(fs) / 1000, 100*(np.array(Pvs_IC)-df_Pv_comsol["P_v"])/df_Pv_comsol["P_v"], label=f"IC model", color=colors[0])
 
 
 # Plot losses from static model
-ax[0].plot(np.array(fs) / 1000, Pvs_static,  "--", label=f"Static model", color=colors[0])
-ax[1].plot(np.array(fs) / 1000, (np.array(Pvs_static)-df_Pv_comsol["P_v"])/df_Pv_comsol["P_v"],  "--", label=f"Static model", color=colors[0])
+ax[0].semilogy(np.array(fs) / 1000, Pvs_static,  "--", label=f"Static model", color=colors[0])
+ax[1].plot(np.array(fs) / 1000, 100*(np.array(Pvs_static)-df_Pv_comsol["P_v"])/df_Pv_comsol["P_v"],  "--", label=f"Static model", color=colors[0])
 
 
-ax[0].set_ylabel(r"$P_\mathrm{v}$ / W")
-ax[1].set_ylabel(r"rel. dev. from FEM")
+ax[0].set_ylabel(r"$P_\mathrm{v, x}$ / W")
+ax[1].set_ylabel(r"$\frac{P_\mathrm{v, x} - P_\mathrm{v, FEM}}{P_\mathrm{v, FEM}}$ / %")
 ax[1].set_xlabel(r"$f$ / kHz")
 
 ax[0].legend()
@@ -121,6 +121,6 @@ fig.align_labels()
 plt.subplots_adjust(wspace=0, hspace=0.1)
 plt.tight_layout()
 
-plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC_losses.pdf"))
-plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC_losses.png"))
+plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC_losses_2025_06_30.pdf"))
+plt.savefig(os.path.join(paths.grafics, f"FEM_vs_IC_losses_2025_06_30.png"))
 plt.show()

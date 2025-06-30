@@ -12,7 +12,8 @@ from meta import paths
 # Problem definition
 R = 7.5e-3
 T_c = 50
-fs = [100e3, 700e3]
+# fs = [100e3, 700e3]
+fs = [1000e3]
 fig, ax = plt.subplots(6, figsize=(3.5, 6), sharex=True)
 
 
@@ -25,7 +26,7 @@ for i, f in enumerate(fs):
 
     # --- Comsol
     # --- Magnetic flux density ---
-    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/MagB_horizontal.txt"), field_name="MagB",
+    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/MagB_horizontal.txt"), field_name="MagB",
                                                                           R=R)
     # 1d plot in dependency of the radius
     r_B_comsol = np.sqrt(x_B_comsol ** 2 + y_B_comsol ** 2)
@@ -36,28 +37,28 @@ for i, f in enumerate(fs):
     print(f"\nmagnetic_flux = {np.round(magnetic_flux_comsol * 1e6, 3)} µVs (from comsol)")
 
     # --- Electric field ---
-    x_E_comsol, y_E_comsol, E_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/MagE_horizontal.txt"), field_name="MagE",
+    x_E_comsol, y_E_comsol, E_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/MagE_horizontal.txt"), field_name="MagE",
                                                                           R=R)
     # 1d plot in dependency of the radius
     r_E_comsol = np.sqrt(x_E_comsol ** 2 + y_E_comsol ** 2)
     ax[3].plot(1000 * r_E_comsol, E_comsol, "*", color=comsol_color)
 
     # --- Real permeability ---
-    x_mu_real_comsol, y_mu_real_comsol, mu_real_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/mu_real_horizontal.txt"),
+    x_mu_real_comsol, y_mu_real_comsol, mu_real_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/mu_real_horizontal.txt"),
                                                                                             field_name="MagE", R=R)
     # 1d plot in dependency of the radius
     r_mu_real_comsol = np.sqrt(x_mu_real_comsol ** 2 + y_mu_real_comsol ** 2)
     ax[1].plot(1000 * r_mu_real_comsol, mu_real_comsol, "*", color=comsol_color)
 
     # --- Imag permeability ---
-    x_mu_imag_comsol, y_mu_imag_comsol, mu_imag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/mu_imag_horizontal.txt"),
+    x_mu_imag_comsol, y_mu_imag_comsol, mu_imag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/mu_imag_horizontal.txt"),
                                                                                             field_name="MagE", R=R)
     # 1d plot in dependency of the radius
     r_mu_imag_comsol = np.sqrt(x_mu_imag_comsol ** 2 + y_mu_imag_comsol ** 2)
     ax[2].plot(1000 * r_mu_imag_comsol, mu_imag_comsol, "*", color=comsol_color)
 
     # --- Magnetic loss density ---
-    x_p_mag_comsol, y_p_mag_comsol, p_mag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/p_mag_horizontal.txt"),
+    x_p_mag_comsol, y_p_mag_comsol, p_mag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/p_mag_horizontal.txt"),
                                                                                       field_name="p_mag", R=R)
     # 1d plot in dependency of the radius
     r_p_mag_comsol = np.sqrt(x_p_mag_comsol ** 2 + y_p_mag_comsol ** 2)
@@ -68,7 +69,7 @@ for i, f in enumerate(fs):
     print(f"mean mag. loss density: {mean_pv_mag_comsol / 1000} kW/m³")
 
     # --- Electric loss density ---
-    x_p_el_comsol, y_p_el_comsol, p_el_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{int(f)}/p_el_horizontal.txt"),
+    x_p_el_comsol, y_p_el_comsol, p_el_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/p_el_horizontal.txt"),
                                                                                    field_name="p_el", R=R)
     # 1d plot in dependency of the radius
     r_p_el_comsol = np.sqrt(x_p_el_comsol ** 2 + y_p_el_comsol ** 2)
@@ -102,13 +103,13 @@ for i, f in enumerate(fs):
         B_ = mu_h(np.abs(H_)) * H_
 
         # flux
-        flux = integral_2d_axi_symmetry_flux_from_b_(r_, B_)
+        flux = integrate_2d_axi_symmetry_field(r_, B_)
 
         pv_mag = f_pv_mag(f, mu_h(np.abs(H_)).imag, np.abs(H_))
-        mean_pv_mag = integral_2d_axi_symmetry_flux_from_b_(r_, pv_mag) / np.pi / R ** 2
+        mean_pv_mag = integrate_2d_axi_symmetry_field(r_, pv_mag) / np.pi / R ** 2
 
         pv_el = f_pv_el(f, eps.imag, np.abs(E_))
-        mean_pv_el = integral_2d_axi_symmetry_flux_from_b_(r_, pv_el) / np.pi / R ** 2
+        mean_pv_el = integrate_2d_axi_symmetry_field(r_, pv_el) / np.pi / R ** 2
 
         A = A + 0.01
 
