@@ -156,10 +156,10 @@ y_max = 2000
 ax.fill_betweenx([y_min, y_max], f_min_kHz, f_max_kHz, color='gray', alpha=0.3)
 
 ax.text(
-    (f_min_kHz + f_max_kHz) / 2,
+    f_min_kHz,
     y_min,
-    "recommended\nfrequency\nrange by TDK",
-    ha='center', va='bottom',
+    "recommended\nfrequency range\n(from TDK)",
+    ha='left', va='bottom',
     fontsize=9, color='black'
 )
 

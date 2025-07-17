@@ -34,10 +34,8 @@ result_folder = "non_linear_material_study"
 R = 7.5e-3          # radius
 T_c = 50            # temperature (unused here)
 
-n_ags = [1]     # number of air gaps
-d_ags = [1.8]  # air gap length in mm
-# n_ags = [0, 1, 2, 3]     # number of air gaps
-# d_ags = [0, 1.8, 1.8, 1.8]  # air gap length in mm
+n_ags = [0, 1, 2, 3]     # number of air gaps
+d_ags = [0, 1.8, 1.8, 1.8]  # air gap length in mm
 
 b_mean_goal = 50e-3       # Tesla
 flux_goal = b_mean_goal * np.pi * R ** 2
@@ -49,7 +47,8 @@ f_min = 0.9e5
 # load material data
 df_mu = materials.read_permeability_txt2df(material_name="N49")
 df_eps = materials.read_permittivity_txt2df(material_name="N49")
-
+print(df_mu[(df_mu["f"] == 100000) & (df_mu["T"] == 50)])
+print(df_eps)
 
 # -------------------------
 # Plot setup
@@ -72,7 +71,7 @@ for n_ag, d_ag in zip(n_ags, d_ags):
     # -------------------------
     df_flux = comsol.read_df_from_comsol_table(
         link2file=os.path.join(paths.comsol_results, f"{result_folder}/flux_{n_ag}.txt"),
-        header=["f", "f2", "real_flux", "complex_flux", "abs_complex_flux"]
+        header=["f", "real_flux", "complex_flux", "abs_complex_flux"]
     )
     df_flux = df_flux[df_flux["f"] > f_min]
     fs = df_flux["f"]
@@ -135,7 +134,7 @@ for n_ag, d_ag in zip(n_ags, d_ags):
     # -------------------------
     df_Pv = comsol.read_df_from_comsol_table(
         link2file=os.path.join(paths.comsol_results, f"{result_folder}/losses_{n_ag}.txt"),
-        header=["f", "f2", "P_mag", "P_el", "P_v"]
+        header=["f", "P_mag", "P_el", "P_v"]
     )
     df_Pv = df_Pv[df_Pv["f"] > f_min]
 
@@ -165,12 +164,13 @@ y_max = 2000
 ax.fill_betweenx([y_min, y_max], f_min_kHz, f_max_kHz, color='gray', alpha=0.3)
 
 ax.text(
-    (f_min_kHz + f_max_kHz) / 2,
+    f_min_kHz,
     y_min,
-    "recommended\nfrequency\nrange by TDK",
-    ha='center', va='bottom',
+    "recommended\nfrequency range\n(from TDK)",
+    ha='left', va='bottom',
     fontsize=9, color='black'
 )
+
 
 # -------------------------
 # Final plot touches
@@ -183,8 +183,7 @@ line2 = matplotlib.lines.Line2D([0], [0], label=r"IC", color='k')
 line3 = matplotlib.lines.Line2D([0], [0], label=r"FEM", color='k', marker="x", linestyle="")
 legend1 = ax.legend(handles=[line1, line2, line3], ncol=1, loc="upper left")
 
-# ax.legend(ncols=1, loc="lower right", title="air gaps:")
-ax.legend(ncols=1, loc="upper center", title="air gaps:")
+ax.legend(ncols=1, loc="lower right", title="air gaps:")
 plt.gca().add_artist(legend1)
 
 ax.grid()

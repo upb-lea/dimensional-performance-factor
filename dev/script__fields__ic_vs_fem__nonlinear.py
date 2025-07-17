@@ -55,7 +55,7 @@ comsol_color = '0.8'
 # -------------------------
 df_flux_comsol = comsol.read_df_from_comsol_table(
     link2file=os.path.join(paths.comsol_results, f"{result_folder}/flux_{n_ag}.txt"),
-    header=["f", "f2", "real_flux", "complex_flux", "abs_complex_flux"]
+    header=["f", "real_flux", "complex_flux", "abs_complex_flux"]
 )
 
 # -------------------------
@@ -211,6 +211,7 @@ ax[4].set_ylabel(r"$\mu_\mathrm{real}$")
 ax[5].set_ylabel(r"$\mu_\mathrm{imag}$")
 ax[5].set_xlabel(r"$r$ / mm")
 ax[0].legend(ncols=3, loc='upper center', bbox_to_anchor=[0.4, 2.05])
+ax[5].set_xticks([0, 2.5, 5, 7.5])
 
 for a in ax:
     a.grid()

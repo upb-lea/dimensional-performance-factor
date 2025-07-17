@@ -161,6 +161,7 @@ ax[2].set_ylabel(r"$p_\mathrm{mag}$ / $\frac{\mathrm{kW}}{\mathrm{m^3}}$")
 ax[3].set_ylabel(r"$p_\mathrm{el}$ / $\frac{\mathrm{kW}}{\mathrm{m^3}}$")
 ax[3].set_xlabel(r"$r$ / mm")
 ax[0].legend(ncols=3, loc='upper center', bbox_to_anchor=[0.4, 1.8])
+ax[3].set_xticks([0, 2.5, 5, 7.5])
 
 for a in ax:
     a.grid()
