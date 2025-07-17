@@ -9,6 +9,8 @@ from meta.plot_settings import colors
 from utils.maths import integrate_2d
 from meta import paths
 
+result_folder = "rectangular_conductor_4A"
+
 # Problem definition
 R = 7.5e-3
 T_c = 50
@@ -16,6 +18,9 @@ T_c = 50
 fs = [1000e3]
 fig, ax = plt.subplots(6, figsize=(3.5, 6), sharex=True)
 
+# flux values from Comsol
+df_flux_comsol = comsol.read_df_from_comsol_table(link2file=os.path.join(paths.comsol_results, f"{result_folder}/flux.txt"),
+                                                  header=["lam", "i", "f", "T_c", "f2", "flux", "complex_flux"])
 
 # load material data
 df_mu = materials.read_permeability_txt2df(material_name="N49")
@@ -26,39 +31,40 @@ for i, f in enumerate(fs):
 
     # --- Comsol
     # --- Magnetic flux density ---
-    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/MagB_horizontal.txt"), field_name="MagB",
+    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/MagB_horizontal.txt"), field_name="MagB",
                                                                           R=R)
     # 1d plot in dependency of the radius
     r_B_comsol = np.sqrt(x_B_comsol ** 2 + y_B_comsol ** 2)
     ax[0].plot(1000 * r_B_comsol, B_comsol * 1000, "*", color=comsol_color)
 
     # --- Total magnetic flux by numerical integration ---
-    magnetic_flux_comsol = 4 * integrate_2d(x=x_B_comsol, y=y_B_comsol, f=np.abs(B_comsol))
+    # magnetic_flux_comsol = 4 * integrate_2d(x=x_B_comsol, y=y_B_comsol, f=np.abs(B_comsol))
+    magnetic_flux_comsol = df_flux_comsol.loc[df_flux_comsol["f"] == f]["flux"].to_numpy()[0]
     print(f"\nmagnetic_flux = {np.round(magnetic_flux_comsol * 1e6, 3)} µVs (from comsol)")
 
     # --- Electric field ---
-    x_E_comsol, y_E_comsol, E_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/MagE_horizontal.txt"), field_name="MagE",
+    x_E_comsol, y_E_comsol, E_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/MagE_horizontal.txt"), field_name="MagE",
                                                                           R=R)
     # 1d plot in dependency of the radius
     r_E_comsol = np.sqrt(x_E_comsol ** 2 + y_E_comsol ** 2)
     ax[3].plot(1000 * r_E_comsol, E_comsol, "*", color=comsol_color)
 
     # --- Real permeability ---
-    x_mu_real_comsol, y_mu_real_comsol, mu_real_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/mu_real_horizontal.txt"),
+    x_mu_real_comsol, y_mu_real_comsol, mu_real_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/mu_real_horizontal.txt"),
                                                                                             field_name="MagE", R=R)
     # 1d plot in dependency of the radius
     r_mu_real_comsol = np.sqrt(x_mu_real_comsol ** 2 + y_mu_real_comsol ** 2)
     ax[1].plot(1000 * r_mu_real_comsol, mu_real_comsol, "*", color=comsol_color)
 
     # --- Imag permeability ---
-    x_mu_imag_comsol, y_mu_imag_comsol, mu_imag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/mu_imag_horizontal.txt"),
+    x_mu_imag_comsol, y_mu_imag_comsol, mu_imag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/mu_imag_horizontal.txt"),
                                                                                             field_name="MagE", R=R)
     # 1d plot in dependency of the radius
     r_mu_imag_comsol = np.sqrt(x_mu_imag_comsol ** 2 + y_mu_imag_comsol ** 2)
     ax[2].plot(1000 * r_mu_imag_comsol, mu_imag_comsol, "*", color=comsol_color)
 
     # --- Magnetic loss density ---
-    x_p_mag_comsol, y_p_mag_comsol, p_mag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/p_mag_horizontal.txt"),
+    x_p_mag_comsol, y_p_mag_comsol, p_mag_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/p_mag_horizontal.txt"),
                                                                                       field_name="p_mag", R=R)
     # 1d plot in dependency of the radius
     r_p_mag_comsol = np.sqrt(x_p_mag_comsol ** 2 + y_p_mag_comsol ** 2)
@@ -69,7 +75,7 @@ for i, f in enumerate(fs):
     print(f"mean mag. loss density: {mean_pv_mag_comsol / 1000} kW/m³")
 
     # --- Electric loss density ---
-    x_p_el_comsol, y_p_el_comsol, p_el_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/p_el_horizontal.txt"),
+    x_p_el_comsol, y_p_el_comsol, p_el_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/p_el_horizontal.txt"),
                                                                                    field_name="p_el", R=R)
     # 1d plot in dependency of the radius
     r_p_el_comsol = np.sqrt(x_p_el_comsol ** 2 + y_p_el_comsol ** 2)
@@ -87,14 +93,20 @@ for i, f in enumerate(fs):
     # Interpolate / Extrapolate material data for f/T-operation point
     eps = materials.eps_from_df(df_eps, f, T_c)
     print(eps / epsilon_0)
+    eps = eps + 1 / (10 * 2*np.pi*f*complex(0, 1))  # todo: change Comsol material
+    print(eps / epsilon_0)
     mu_h = materials.mu_h_from_df(df_mu, f, T_c)
     print("\nIC model:\n")
 
     A = 0
     flux = 0
-    while not abs(flux) > phi_max:
+    H_ = 0
+    while not abs(flux) > magnetic_flux_comsol:
         # Calculate the magnetic field for the infinite cylinder
-        r_, H_, E_ = ic.r_h_e_(R=R, f=f, A=A, eps=eps, mu_of_h=mu_h)
+        # TODO: WHich function? Are they correct?
+        # r_, H_, E_ = ic.r_h_e_(R=R, f=f, A=A, eps=eps, mu_of_h=mu_h)
+        # r_, H_, E_ = ic.r_h_e_NL(R=R, f=f, A=A, eps=eps, mu_h=mu_h)
+        r_, H_, E_ = ic.r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_h(np.mean(np.abs(H_))))
 
         # Calcultate the dielectric flux from the material law
         D_ = eps * E_

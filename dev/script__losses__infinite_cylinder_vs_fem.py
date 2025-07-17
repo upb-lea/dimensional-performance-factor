@@ -9,6 +9,8 @@ from meta.plot_settings import colors
 from utils.maths import integrate_2d
 from meta import paths
 
+result_folder = "rectangular_conductor_4A"
+
 # Problem definition
 R = 7.5e-3
 L_c = (29.5 - 1.8) / 1000  # center leg core length (window height - air gap length)
@@ -17,6 +19,10 @@ T_c = 50
 fs = np.linspace(100e3, 1000e3, 10)
 Pvs_IC = []
 Pvs_static = []
+
+# flux values from Comsol
+df_flux_comsol = comsol.read_df_from_comsol_table(link2file=os.path.join(paths.comsol_results, f"{result_folder}/flux.txt"),
+                                                  header=["lam", "i", "f", "T_c", "f2", "flux", "complex_flux"])
 
 # load material data
 df_mu = materials.read_permeability_txt2df(material_name="N49")
@@ -28,13 +34,14 @@ for i, f in enumerate(fs):
 
     # --- Comsol
     # --- Magnetic flux density ---
-    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"rectangular_conductor_4A/{int(f)}/MagB_horizontal.txt"), field_name="MagB",
+    x_B_comsol, y_B_comsol, B_comsol = comsol.read_comsol_2d_circle_field(link=os.path.join(paths.comsol_results, f"{result_folder}/{int(f)}/MagB_horizontal.txt"), field_name="MagB",
                                                                           R=R*1.001)
     # 1d plot in dependency of the radius
     r_B_comsol = np.sqrt(x_B_comsol ** 2 + y_B_comsol ** 2)
 
     # --- Total magnetic flux by numerical integration ---
-    magnetic_flux_comsol = 4 * integrate_2d(x=x_B_comsol, y=y_B_comsol, f=np.abs(B_comsol))
+    # magnetic_flux_comsol = 4 * integrate_2d(x=x_B_comsol, y=y_B_comsol, f=np.abs(B_comsol))
+    magnetic_flux_comsol = df_flux_comsol.loc[df_flux_comsol["f"] == f]["flux"].to_numpy()[0]
     print(f"\nmagnetic_flux = {np.round(magnetic_flux_comsol * 1e6, 3)} µVs (from comsol)")
 
     # --- IC model
@@ -43,13 +50,18 @@ for i, f in enumerate(fs):
 
     # Interpolate / Extrapolate material data for f/T-operation point
     eps = materials.eps_from_df(df_eps, f, T_c)
+    print(eps / epsilon_0)
+    eps = eps + 1 / (10 * 2*np.pi*f*complex(0, 1))  # todo: change Comsol material
+    print(eps / epsilon_0)
     mu_h = materials.mu_h_from_df(df_mu, f, T_c)
 
     A = 0
     flux = 0
+    H_ = 0
     while not abs(flux) > magnetic_flux_comsol:
         # Calculate the magnetic field for the infinite cylinder
-        r_, H_, E_ = ic.r_h_e_(R=R, f=f, A=A, eps=eps, mu_of_h=mu_h)
+        # r_, H_, E_ = ic.r_h_e_(R=R, f=f, A=A, eps=eps, mu_of_h=mu_h)
+        r_, H_, E_ = ic.r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_h(np.mean(np.abs(H_))))
 
         # Calculate magnetic flux density from material law
         B_ = mu_h(np.abs(H_)) * H_
@@ -80,7 +92,6 @@ for i, f in enumerate(fs):
     print(f"Tot. losses in center leg: {Pv} W")
     print("\n\n")
 
-
     # --- Static losses
     B_abs_static = magnetic_flux_comsol / np.pi / R ** 2
     print(f"{B_abs_static = }")
@@ -92,7 +103,7 @@ for i, f in enumerate(fs):
 
 
 # Plot losses from 3D simulation:
-df_Pv_comsol = comsol.read_df_from_comsol_table(link2file=os.path.join(paths.comsol_results, "rectangular_conductor_4A/core losses.txt"),
+df_Pv_comsol = comsol.read_df_from_comsol_table(link2file=os.path.join(paths.comsol_results, f"{result_folder}/core losses.txt"),
                                                 header=["lam", "i", "f", "T_c", "f2", "P_mag", "P_el", "P_v"])
 ax[0].plot(df_Pv_comsol["f"] / 1000, df_Pv_comsol["P_v"], label=f"3D FEM", color=colors[3])
 
