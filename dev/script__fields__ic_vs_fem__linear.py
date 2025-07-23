@@ -32,7 +32,7 @@ n_ag = 1
 fs = [500e3, 1000e3]
 fs_labels = ["500 kHz", "1 MHz"]
 n_sample = 10
-FEM_marker = "."
+FEM_marker = "x"
 
 # -------------------------
 # Material properties (linear)
