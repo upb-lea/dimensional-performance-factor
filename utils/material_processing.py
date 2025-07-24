@@ -102,3 +102,12 @@ def mu_h_from_df(df_mu, f, T):
         return mu_real_interp_h(h) + j * mu_imag_interp_h(h)
 
     return mu_of_h
+
+
+def mu_h_from_mu_b(mu_b_complex, b_common):
+    h_max, mu_real_interp_h, mu_imag_interp_h = mu_complex_h(b_common, mu_b_complex)
+
+    def mu_of_h(h):
+        return mu_real_interp_h(h) + j * mu_imag_interp_h(h)
+
+    return mu_of_h

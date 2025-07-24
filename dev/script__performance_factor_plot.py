@@ -37,7 +37,7 @@ colors = ["tab:pink", "tab:purple", "tab:blue", "tab:cyan", "tab:green", "tab:ol
 fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9 * cm, 16 * cm), sharex=True)
 
 # Load results
-results = load_dict("PF_comparison.json")
+results = load_dict("old_delete_after_24_07_2025/PF_comparison.json")
 
 f_ = np.array(results["frequencies"])
 pv_limit = results["pv_limit"]

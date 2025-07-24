@@ -4,6 +4,7 @@ from utils.physics import *
 from utils.maths import *
 from utils.general_functions import save_dict
 import logging
+import materialdatabase as mdb
 
 # configure logging to show femmt terminal output
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
@@ -12,14 +13,13 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 # Problem definition
 # -------------------------
 result_folder = "performance_factor"
-R = 7.5e-3  # radius
 T_c = 100  # temperature
 # T_c = 50  # temperature
 
-f_ = np.array([1e5, 2e5, 3e5, 4e5, 5e5, 6e5, 7e5, 8e5])
-# f_ = np.array([3e5, 4e5, 5e5, 6e5, 7e5, 8e5])
-# f_ = np.array([9e5, 1e6])
+f_ = np.array([1e5, 2e5, 3e5, 4e5, 5e5, 6e5, 7e5, 8e5, 9e5, 1e6])
+# f_ = np.array([1e5, 3e5, 5e5, 7e5, 9e5])
 R_ = [0.004, 0.006, 0.0075, 0.01]
+# R_ = [0.004, 0.0075]
 
 pv_limit = 300000
 PF_tdk = []
@@ -30,31 +30,25 @@ b_mean_dim = []
 PF_static = []
 b_mean_static = []
 
-
-# todo: iterate over materials
 # -------------------------
 # Material (nonlinear)
 # -------------------------
 # init a material database instance
-# mdb_data = mdb.Data()
-# complex_permeability = mdb_data.get_complex_permeability(material=mdb.Material.N49,
-#                                                          measurement_setup=mdb.MeasurementSetup.TDK_MDT,
-#                                                          pv_fit_function=mdb.FitFunction.enhancedSteinmetz)
-# print(f"\nExemplary complex permeability data: \n {complex_permeability.measurement_data} \n")
-#
-# complex_permittivity = mdb_data.get_complex_permittivity(material=mdb.Material.N49,
-#                                                          measurement_setup=mdb.MeasurementSetup.LEA_MTB)
-# print(f"\nExemplary complex permittivity data: \n {complex_permittivity.measurement_data} \n ")
-#
-# df_mu = complex_permeability.measurement_data
-# df_eps = complex_permittivity.measurement_data
-# print(df_mu[(df_mu["f"] == 100000) & (df_mu["T"] == 50)])
-# b_mean_goal = 50e-3  # Tesla
-# flux_goal = b_mean_goal * np.pi * R ** 2
+mdb_data = mdb.Data()
 
-# old material data:
-df_mu = materials.read_permeability_txt2df(material_name="N49")
-df_eps = materials.read_permittivity_txt2df(material_name="N49")
+complex_permeability = mdb_data.get_complex_permeability(material=mdb.Material.N49,
+                                                         measurement_setup=mdb.MeasurementSetup.TDK_MDT,
+                                                         pv_fit_function=mdb.FitFunction.enhancedSteinmetz)
+print(f"\nComplex permeability data: \n {complex_permeability.measurement_data} \n")
+complex_permeability.fit_losses()
+complex_permeability.fit_permeability_magnitude()
+b_common = np.linspace(0, 0.2, 50)
+
+complex_permittivity = mdb_data.get_complex_permittivity(material=mdb.Material.N49,
+                                                         measurement_setup=mdb.MeasurementSetup.LEA_MTB)
+print(f"\nComplex permittivity data: \n {complex_permittivity.measurement_data} \n ")
+df_eps = complex_permittivity.measurement_data
+
 
 # -------------------------
 # Performance Factor
@@ -67,14 +61,25 @@ for i, R in enumerate(R_):
     PF_static_f = []
     b_mean_static_f = []
     for f in f_:
-        eps = materials.eps_from_df(df_eps, f, T_c)  # todo: here: use the new mdb functionality instead
-        mu_h = materials.mu_h_from_df(df_mu, f, T_c)  # todo: here: use the new mdb functionality instead
+        print(f"\n{f = }")
+        # -------------------------
+        # Material fit at temperature and frequency
+        # -------------------------
+        # Permeability:
+        mu_real, mu_imag = complex_permeability.fit_real_and_imaginary_part_at_f_and_T(f_op=f,
+                                                                                       T_op=T_c,
+                                                                                       b_vals=np.linspace(0, 0.2, 50))
+        # an interpolation in terms of the magnetic field h is needed:
+        mu_h = materials.mu_h_from_mu_b((mu_real-j*mu_imag)*mu_0, b_common)
+
+        # Permittivity: Todo: enhanced curve fit instead of interpolation in raw measurement data...
+        eps = materials.eps_from_df(df_eps, f, T_c)
 
         # -------------------------
         # Static model
         # -------------------------
         A = 0  # exciting static magnetic field strength amplitude in A/m
-        A_increment = 0.05  # excitation step size in A/m
+        A_increment = 0.01  # excitation step size in A/m
         pv_reached = False
         while not pv_reached:
             A = A + A_increment
@@ -141,4 +146,4 @@ results = {
     "PF_static": list(PF_static),
     "b_mean_static": list(b_mean_static)}
 
-save_dict("PF_comparison.json", results)
+save_dict("old_delete_after_24_07_2025/PF_comparison.json", results)
