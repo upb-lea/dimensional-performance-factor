@@ -1,18 +1,9 @@
-import os.path
-
 import matplotlib
 
-from utils import infinite_cylinder as ic
-from utils import material_processing as materials
-from utils import comsol_interface as comsol
-from utils.physics import *
 from utils.maths import *
 from utils.general_functions import load_dict
 from matplotlib import pyplot as plt
-from meta.plot_settings import colors
-from meta import paths
 import logging
-import materialdatabase as mdb
 
 # configure logging to show femmt terminal output
 logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
