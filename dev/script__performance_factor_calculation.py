@@ -16,7 +16,8 @@ result_folder = "performance_factor"
 T_c = 100  # temperature
 # T_c = 50  # temperature
 
-f_ = np.array([1e5, 2e5, 3e5, 4e5, 5e5, 6e5, 7e5, 8e5, 9e5, 1e6])
+# f_ = np.array([1e5, 2e5, 3e5, 4e5, 5e5, 6e5, 7e5, 8e5, 9e5, 1e6])
+f_ = np.linspace(1e5, 1e6, 30)
 # f_ = np.array([1e5, 3e5, 5e5, 7e5, 9e5])
 R_ = [0.004, 0.006, 0.0075, 0.01]
 # R_ = [0.004, 0.0075]
@@ -91,7 +92,7 @@ for i, R in enumerate(R_):
             # no integral is needed here, because field is constant:
             complex_flux_static = B_static * np.pi * R ** 2  # alt.: integrate_2d_axi_symmetry_field(r_, B_static)
 
-            PF_static_f_op = abs(complex_flux_static) * f
+            PF_static_f_op = 2 * np.pi * f * abs(complex_flux_static)
             b_mean_static_f_op = abs(complex_flux_static) / np.pi / R ** 2
 
         PF_static_f.append(PF_static_f_op)
@@ -122,7 +123,7 @@ for i, R in enumerate(R_):
 
             if mean_pv_ic > pv_limit:
                 pv_reached = True
-            PF_dim_f_op = abs(complex_flux_ic) * f
+            PF_dim_f_op = 2 * np.pi * f * abs(complex_flux_ic)
             b_mean_dim_f_op = abs(complex_flux_ic) / np.pi / R ** 2
         print(f"{A = } (IC)")
 
