@@ -40,22 +40,22 @@ fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9 * cm, 14 * cm), sharex=True,
                        gridspec_kw={'height_ratios': [1.15, 1]})
 
 # Load results
-results = load_dict("old_delete_after_24_07_2025/PF_comparison.json")
+results = load_dict("PF_comparison.json")
 
 f_ = np.array(results["frequencies"])
 pv_limit = results["pv_limit"]
-R_ = results["radii"]
+materials = results["materials"]
 PF_static = np.array(results["PF_static"])
 b_mean_static = np.array(results["b_mean_static"])
 PF_dim = np.array(results["PF_dim"])
 b_mean_dim = np.array(results["b_mean_dim"])
 
-for i, R in enumerate(R_):
+for i, material in enumerate(materials):
     ax[0].plot(f_ / 1000, PF_static[i], "--", color=colors[i])
     ax[0].plot(f_ / 1000, PF_dim[i], color=colors[i])
 
     ax[1].plot(f_ / 1000, b_mean_static[i]*1000, "--", color=colors[i])
-    ax[1].plot(f_ / 1000, b_mean_dim[i]*1000, label=f"$R$ = {R * 1000} mm", color=colors[i])
+    ax[1].plot(f_ / 1000, b_mean_dim[i]*1000, label=f"{material}", color=colors[i])
 
 line1 = matplotlib.lines.Line2D([0], [0], label=r"$2\uppi^2 R^2 \cdot \mathcal{P}\!\mathcal{F}$", color='k', dashes=(5, 2))
 line2 = matplotlib.lines.Line2D([0], [0], label=r"$\mathcal{P}\!\mathcal{F}^\mathrm{dim}$", color='k')
@@ -86,8 +86,10 @@ for i, PF in enumerate(PF_static):
     PF_opt_static.append(PF[idx_max])
 
 # Plot connecting lines
-ax[0].plot(f_opt_dim, PF_opt_dim, color="k", linestyle="-.", marker="o")
-ax[0].plot(f_opt_static, PF_opt_static, color="k", linestyle=":", marker="s")
+ax[0].plot(f_opt_dim, PF_opt_dim, color="k", linestyle="", marker="o")
+ax[0].plot(f_opt_static, PF_opt_static, color="k", linestyle="", marker="s")
+# ax[0].plot(f_opt_dim, PF_opt_dim, color="k", linestyle="-.", marker="o")
+# ax[0].plot(f_opt_static, PF_opt_static, color="k", linestyle=":", marker="s")
 
 # Annotate only the first point of each
 ax[0].annotate(r"$\mathcal{P}\!\mathcal{F}_{\mathrm{max}}^\mathrm{dim}$", xy=(f_opt_dim[-1], PF_opt_dim[-1]), xytext=(-11, 11),
@@ -109,8 +111,8 @@ ax[1].text(0.03, 0.04, "Maximum mean flux\ndensity in the core",
            fontsize=9, ha='left', va='bottom',
            bbox=dict(facecolor='white', edgecolor='k', boxstyle='round,pad=0.3'))
 
-ax[0].set_ylim((0, 100))
-ax[1].set_ylim((0, 160))
+# ax[0].set_ylim((0, 100))
+# ax[1].set_ylim((0, 160))
 
 ax[0].set_ylabel(r"$2 \uppi  f \cdot |\underline{\mathit{\Phi}}|$ / V")
 ax[1].set_ylabel(r"$|\underline{\mathit{\Phi}}| / (\pi R^2)$ / mT")
@@ -119,5 +121,6 @@ ax[1].set_xlabel(r"$f$ in kHz")
 ax[0].grid()
 ax[1].grid()
 plt.tight_layout()
-plt.savefig(os.path.join(paths.grafics, "PF_comparison.pdf"))
+plt.savefig(os.path.join("PF_comparison.pdf"))
+# plt.savefig(os.path.join(paths.grafics, "PF_comparison.pdf"))
 plt.show()

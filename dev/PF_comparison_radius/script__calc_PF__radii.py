@@ -38,7 +38,7 @@ b_mean_static = []
 mdb_data = mdb.Data()
 
 complex_permeability = mdb_data.get_complex_permeability(material=mdb.Material.N49,
-                                                         measurement_setup=mdb.MeasurementSetup.TDK_MDT,
+                                                         data_source=mdb.DataSource.TDK_MDT,
                                                          pv_fit_function=mdb.FitFunction.enhancedSteinmetz)
 print(f"\nComplex permeability data: \n {complex_permeability.measurement_data} \n")
 complex_permeability.fit_losses()
@@ -46,10 +46,10 @@ complex_permeability.fit_permeability_magnitude()
 b_common = np.linspace(0, 0.2, 50)
 
 complex_permittivity = mdb_data.get_complex_permittivity(material=mdb.Material.N49,
-                                                         measurement_setup=mdb.MeasurementSetup.LEA_MTB)
+                                                         data_source=mdb.DataSource.LEA_MTB)
 print(f"\nComplex permittivity data: \n {complex_permittivity.measurement_data} \n ")
-df_eps = complex_permittivity.measurement_data
-
+complex_permittivity.fit_permittivity_magnitude()
+complex_permittivity.fit_loss_angle()
 
 # -------------------------
 # Performance Factor
@@ -71,10 +71,11 @@ for i, R in enumerate(R_):
                                                                                        T_op=T_c,
                                                                                        b_vals=np.linspace(0, 0.2, 50))
         # an interpolation in terms of the magnetic field h is needed:
-        mu_h = materials.mu_h_from_mu_b((mu_real-j*mu_imag)*mu_0, b_common)
+        mu_h = materials.mu_h_from_mu_b((mu_real - j * mu_imag) * mu_0, b_common)
 
-        # Permittivity: Todo: enhanced curve fit instead of interpolation in raw measurement data...
-        eps = materials.eps_from_df(df_eps, f, T_c)
+        # Permittivity:
+        eps_real, eps_imag = complex_permittivity.fit_real_and_imaginary_part_at_f_and_T(f=f, T=T_c)
+        eps = epsilon_0 * (eps_real - complex(0, 1) * eps_imag)
 
         # -------------------------
         # Static model
@@ -147,4 +148,4 @@ results = {
     "PF_static": list(PF_static),
     "b_mean_static": list(b_mean_static)}
 
-save_dict("old_delete_after_24_07_2025/PF_comparison.json", results)
+save_dict("PF_comparison.json", results)
