@@ -16,7 +16,7 @@ from meta import paths
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Bitstream Vera Sans",
-    'font.size': 11.0,
+    'font.size': 10.0,
     'text.latex.preamble': r"\usepackage{upgreek}",
     'mathtext.fontset': 'custom',
     'mathtext.rm': 'Bitstream Vera Serif',
@@ -27,7 +27,7 @@ plt.rcParams.update({
 # -------------------------
 # Problem definition
 # -------------------------
-result_folder = "non_linear_material_study"
+result_folder = "old_material_data/non_linear_material_study"
 R = 7.5e-3  # radius
 T_c = 50            # temperature (unused here)
 n_ag = 1
@@ -47,7 +47,7 @@ df_eps = materials.read_permittivity_txt2df(material_name="N49")
 # Plot setup
 # -------------------------
 cm = 1 / 2.54
-fig, ax = plt.subplots(6, figsize=(9*cm, 13*cm), sharex=True)
+fig, ax = plt.subplots(6, figsize=(9*cm, 12*cm), sharex=True)
 comsol_color = '0.8'
 
 # -------------------------
@@ -210,7 +210,7 @@ ax[3].set_ylabel(r"$p_\mathrm{el}$ / $\frac{\mathrm{kW}}{\mathrm{m^3}}$")
 ax[4].set_ylabel(r"$\mu_\mathrm{real}$")
 ax[5].set_ylabel(r"$\mu_\mathrm{imag}$")
 ax[5].set_xlabel(r"$r$ / mm")
-ax[0].legend(ncols=3, loc='upper center', bbox_to_anchor=[0.4, 2.05])
+ax[0].legend(ncols=3, loc='upper center', bbox_to_anchor=[0.5, 1.85], fontsize=9)
 ax[5].set_xticks([0, 2.5, 5, 7.5])
 
 for a in ax:

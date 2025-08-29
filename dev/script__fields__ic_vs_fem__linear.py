@@ -15,7 +15,7 @@ from meta import paths
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Bitstream Vera Sans",
-    'font.size': 11.0,
+    'font.size': 10.0,
     'text.latex.preamble': r"\usepackage{upgreek}",
     'mathtext.fontset': 'custom',
     'mathtext.rm': 'Bitstream Vera Serif',
@@ -26,7 +26,7 @@ plt.rcParams.update({
 # -------------------------
 # Problem definition
 # -------------------------
-result_folder = "linear_material_air_gap_study"
+result_folder = "old_material_data/linear_material_air_gap_study"
 R = 7.5e-3  # radius
 n_ag = 1
 fs = [500e3, 1000e3]
@@ -160,7 +160,7 @@ ax[1].set_ylabel(r"$E$ / $\frac{\mathrm{V}}{\mathrm{m}}$")
 ax[2].set_ylabel(r"$p_\mathrm{mag}$ / $\frac{\mathrm{kW}}{\mathrm{m^3}}$")
 ax[3].set_ylabel(r"$p_\mathrm{el}$ / $\frac{\mathrm{kW}}{\mathrm{m^3}}$")
 ax[3].set_xlabel(r"$r$ / mm")
-ax[0].legend(ncols=3, loc='upper center', bbox_to_anchor=[0.4, 1.8])
+ax[0].legend(ncols=3, loc='upper center', bbox_to_anchor=[0.5, 1.7], fontsize=9)
 ax[3].set_xticks([0, 2.5, 5, 7.5])
 
 for a in ax:

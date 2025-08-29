@@ -18,7 +18,7 @@ from meta import paths
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Bitstream Vera Sans",
-    'font.size': 11.0,
+    'font.size': 10.0,
     'text.latex.preamble': r"\usepackage{upgreek}",
     'mathtext.fontset': 'custom',
     'mathtext.rm': 'Bitstream Vera Serif',
@@ -29,7 +29,7 @@ plt.rcParams.update({
 # -------------------------
 # Problem definition
 # -------------------------
-result_folder = "non_linear_material_study"
+result_folder = "old_material_data/non_linear_material_study"
 
 R = 7.5e-3          # radius
 T_c = 50            # temperature (unused here)
@@ -54,7 +54,7 @@ print(df_eps)
 # Plot setup
 # -------------------------
 cm = 1 / 2.54
-fig, ax = plt.subplots(figsize=(9*cm, 9*cm))
+fig, ax = plt.subplots(figsize=(9*cm, 7*cm))
 comsol_color = '0.8'
 
 # -------------------------
@@ -181,9 +181,9 @@ ax.set_ylabel(r"$\overline{p_\mathrm{v}}$ / $\frac{\mathrm{kW}}{\mathrm{m}^3}$")
 line1 = matplotlib.lines.Line2D([0], [0], label=r"static", color='k', linestyle="--")
 line2 = matplotlib.lines.Line2D([0], [0], label=r"IC", color='k')
 line3 = matplotlib.lines.Line2D([0], [0], label=r"FEM", color='k', marker="x", linestyle="")
-legend1 = ax.legend(handles=[line1, line2, line3], ncol=1, loc="upper left")
+legend1 = ax.legend(handles=[line1, line2, line3], ncol=1, loc="upper left", fontsize=9)
 
-ax.legend(ncols=1, loc="lower right", title="air gaps:")
+ax.legend(ncols=1, loc="lower right", title="air gaps:", fontsize=9)
 plt.gca().add_artist(legend1)
 
 ax.grid()

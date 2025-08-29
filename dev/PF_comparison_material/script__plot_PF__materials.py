@@ -50,7 +50,6 @@ radii = sorted({float(R) for mat in materials.values() for R in mat.keys()})
 # -------------------------
 fig, axes = plt.subplots(
     nrows=1, ncols=len(radii),
-    # figsize=(len(radii) * 5 * cm, 7 * cm),
     figsize=(20 * cm, 7 * cm),
     sharey=True
 )
@@ -63,6 +62,10 @@ if len(radii) == 1:
 # -------------------------
 for r_idx, R in enumerate(radii):
     ax = axes[r_idx]
+
+    # Get core type for this radius (take from first material)
+    any_mat_name = list(materials.keys())[0]
+    core_label = materials[any_mat_name][str(R)]["core_type"]
 
     for i, (mat_name, mat_data) in enumerate(materials.items()):
         freqs = np.array(mat_data[str(R)]["frequencies"])
@@ -93,7 +96,7 @@ for r_idx, R in enumerate(radii):
             vertical_alignment = "bottom"
 
         ax.text(
-            f_opt, pos_of_label,  # position at half height
+            f_opt, pos_of_label,
             f"{int(round(f_opt))} kHz",
             color=colors[i % len(colors)],
             fontsize=8,
@@ -107,10 +110,8 @@ for r_idx, R in enumerate(radii):
     ax.set_ylim((0, max_y_tick))
     ax.set_xticks([250, 500, 750])
     ax.set_xlabel(r"$f$ in kHz")
-    ax.set_title(f"$R = {R*1000:.1f}$ mm")
+    ax.set_title(f"$R = {R*1000:.1f}$ mm ({core_label}/_)", fontsize=9)  # include core type
     ax.grid()
-    # if r_idx == 0:
-    #     ax.legend(loc="upper left", fontsize=8)
     ax.legend(loc="upper right", fontsize=8)
 
 # -------------------------

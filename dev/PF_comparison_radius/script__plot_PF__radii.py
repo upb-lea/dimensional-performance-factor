@@ -16,7 +16,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Bitstream Vera Sans",
-    'font.size': 11.0,
+    'font.size': 10.0,
     'text.latex.preamble': r"\usepackage{upgreek}",
     'mathtext.fontset': 'custom',
     'mathtext.rm': 'Bitstream Vera Serif',
@@ -36,7 +36,7 @@ result_folder = "performance_factor"
 cm = 1 / 2.54
 comsol_color = '0.8'
 colors = ["tab:pink", "tab:purple", "tab:blue", "tab:cyan", "tab:green", "tab:olive", "tab:red", "tab:orange"]
-fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9 * cm, 14 * cm), sharex=True,
+fig, ax = plt.subplots(nrows=2, ncols=1, figsize=(9 * cm, 12 * cm), sharex=True,
                        gridspec_kw={'height_ratios': [1.15, 1]})
 
 # Load results
@@ -59,8 +59,8 @@ for i, R in enumerate(R_):
 
 line1 = matplotlib.lines.Line2D([0], [0], label=r"$2\uppi^2 R^2 \cdot \mathcal{P}\!\mathcal{F}$", color='k', dashes=(5, 2))
 line2 = matplotlib.lines.Line2D([0], [0], label=r"$\mathcal{P}\!\mathcal{F}^\mathrm{dim}$", color='k')
-legend1 = plt.legend(handles=[line1, line2], ncol=1, loc="upper left", bbox_to_anchor=(0, 2.28))
-ax[1].legend(ncols=1, loc="upper right", bbox_to_anchor=(1, 1))
+legend1 = plt.legend(handles=[line1, line2], ncol=1, loc="upper left", bbox_to_anchor=(0, 2.28), fontsize=9)
+ax[1].legend(ncols=1, loc="upper right", bbox_to_anchor=(1, 1), fontsize=9)
 plt.gca().add_artist(legend1)
 
 # -------------------------
@@ -91,12 +91,12 @@ ax[0].plot(f_opt_static, PF_opt_static, color="k", linestyle=":", marker="s")
 
 # Annotate only the first point of each
 ax[0].annotate(r"$\mathcal{P}\!\mathcal{F}_{\mathrm{max}}^\mathrm{dim}$", xy=(f_opt_dim[-1], PF_opt_dim[-1]), xytext=(-11, 11),
-               textcoords="offset points", fontsize=10, color="k",
+               textcoords="offset points", fontsize=9, color="k",
                bbox=dict(facecolor='white', edgecolor='k', boxstyle='round,pad=0.3'))
 
 
 ax[0].annotate(r"$\mathcal{P}\!\mathcal{F}_{\mathrm{max}}$", xy=(f_opt_static[-1], PF_opt_static[-1]), xytext=(6, -20),
-               textcoords="offset points", fontsize=10, color="k",
+               textcoords="offset points", fontsize=9, color="k",
                bbox=dict(facecolor='white', edgecolor='k', boxstyle='round,pad=0.3'))
 
 

@@ -186,6 +186,7 @@ for m_idx, mat in enumerate(materials):
 
     for r_idx, R in enumerate(R_):
         results["materials"][mat_name][R] = {
+            "core_type": core_type[r_idx],  # store core type
             "frequencies": list(freqs_per_material[mat][R]),  # <-- per-radius array
             "PF_dim": list(PF_dim[m_idx][r_idx]),
             "b_mean_dim": list(b_mean_dim[m_idx][r_idx]),
