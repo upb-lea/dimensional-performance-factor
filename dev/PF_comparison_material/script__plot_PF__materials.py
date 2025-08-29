@@ -18,7 +18,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 plt.rcParams.update({
     "text.usetex": True,
     "font.family": "Bitstream Vera Sans",
-    "font.size": 11.0,
+    "font.size": 10.0,
     "text.latex.preamble": r"\usepackage{upgreek}",
     "mathtext.fontset": "custom",
     "mathtext.rm": "Bitstream Vera Serif",
@@ -50,7 +50,7 @@ radii = sorted({float(R) for mat in materials.values() for R in mat.keys()})
 # -------------------------
 fig, axes = plt.subplots(
     nrows=1, ncols=len(radii),
-    figsize=(20 * cm, 7 * cm),
+    figsize=(18 * cm, 7 * cm),
     sharey=True
 )
 
