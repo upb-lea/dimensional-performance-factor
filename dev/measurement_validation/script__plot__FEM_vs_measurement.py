@@ -57,32 +57,35 @@ fig, axes = plt.subplots(
 # Collect all frequencies for x-axis range
 all_freqs = []
 
+# FEM
+df_Pv = comsol.read_df_from_comsol_table(
+    link2file=os.path.join(
+        paths.comsol_results,
+        f"measurement_validation_2025_09_25-sweep/core_losses_new_data.txt"
+        # f"measurement_validation_2025_09_25-sweep/core_losses.txt"
+    ),
+    header=["f"] + core_names
+)
+df_Pv_static = comsol.read_df_from_comsol_table(
+    link2file=os.path.join(
+        paths.comsol_results,
+        f"measurement_validation_2025_09_25-sweep/core_losses_static.txt"
+    ),
+    header=["f"] + core_names
+)
+
 for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
     ax_loss = axes[0, col]
     ax_dev = axes[1, col]
 
     # FEM
-    df_Pv = comsol.read_df_from_comsol_table(
-        link2file=os.path.join(
-            paths.comsol_results,
-            f"measurement_validation/2025_08_29__{core_name}_60C_50mT.txt"
-        ),
-        header=["f", "P_mag", "P_el", "P_v"]
-    )
-    p_fem = df_Pv["P_v"] / core_volume / 1000
+    p_fem = df_Pv[core_name] / core_volume / 1000
     f_fem = df_Pv["f"] / 1000
     ax_loss.semilogy(f_fem, p_fem, label="FEM", color=color_fem)
     all_freqs.extend(df_Pv["f"].values)
 
     # FEM static
-    df_Pv_static = comsol.read_df_from_comsol_table(
-        link2file=os.path.join(
-            paths.comsol_results,
-            f"measurement_validation/2025_08_29__{core_name}_60C_50mT_static.txt"
-        ),
-        header=["f", "P_mag", "P_el", "P_v"]
-    )
-    p_fem_static = df_Pv_static["P_v"] / core_volume / 1000
+    p_fem_static = df_Pv_static[core_name] / core_volume / 1000
     f_fem_static = df_Pv_static["f"] / 1000
     ax_loss.semilogy(f_fem_static, p_fem_static, "--", label="FEM\n(static)", color=color_fem)
     all_freqs.extend(df_Pv_static["f"].values)
@@ -95,6 +98,26 @@ for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
     ax_loss.scatter(f_meas, p_meas, s=30, alpha=0.6, label="Meas.", color=color_meas)
     all_freqs.extend(df["f"].values)
     ax_loss.set_ylim(5, 2000)
+
+    # -------------------------
+    # Highlight difference in upper plot (losses)
+    # -------------------------
+    # Interpolate so both curves are evaluated on the same f-grid (f_meas already exists)
+    # p_fem_interp_loss = np.interp(f_meas, f_fem, p_fem)
+    # p_fem_static_interp_loss = np.interp(f_meas, f_fem_static, p_fem_static)
+
+    ax_loss.fill_between(
+        f_fem,
+        p_fem,
+        p_fem_static,
+        color="red",
+        alpha=0.2,
+        label="Diff."
+    )
+
+
+
+
 
     # -------------------------
     # Deviation calculation
@@ -110,14 +133,25 @@ for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
     ax_dev.axhline(0, color="black", linestyle="--", linewidth=0.8)
     ax_dev.set_ylim(-70, 20)
     ax_dev.set_yticks([-60, -40, -20, 0, 20])
+
+    # -------------------------
+    # Highlight the difference
+    # -------------------------
+
+    ax_dev.fill_between(
+        f_meas,
+        dev_fem,
+        dev_fem_static,
+        color="red",
+        alpha=0.2,
+        interpolate=True,
+        label="Diff."
+    )
+
     # -------------------------
     # Titles
     # -------------------------
     ax_loss.set_title(core_name)
-
-    # if col == 2:
-    #     ax_loss.legend(loc="best", fontsize=8, frameon=True)
-    #     ax_dev.legend(loc="best", fontsize=8, frameon=True)
 
 # -------------------------
 # Labels, limits, legend
