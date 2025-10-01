@@ -61,15 +61,14 @@ all_freqs = []
 df_Pv = comsol.read_df_from_comsol_table(
     link2file=os.path.join(
         paths.comsol_results,
-        f"measurement_validation_2025_09_25-sweep/core_losses_new_data.txt"
-        # f"measurement_validation_2025_09_25-sweep/core_losses.txt"
+        f"measurement_validation_2025_10_01/core_losses.txt"
     ),
     header=["f"] + core_names
 )
 df_Pv_static = comsol.read_df_from_comsol_table(
     link2file=os.path.join(
         paths.comsol_results,
-        f"measurement_validation_2025_09_25-sweep/core_losses_static.txt"
+        f"measurement_validation_2025_10_01/core_losses_static.txt"
     ),
     header=["f"] + core_names
 )
@@ -114,9 +113,6 @@ for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
         alpha=0.2,
         label="Diff."
     )
-
-
-
 
 
     # -------------------------
