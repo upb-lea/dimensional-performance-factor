@@ -61,14 +61,14 @@ all_freqs = []
 df_Pv = comsol.read_df_from_comsol_table(
     link2file=os.path.join(
         paths.comsol_results,
-        f"measurement_validation_2025_10_01/core_losses.txt"
+        f"measurement_validation_2025_10_02/core_losses.txt"
     ),
     header=["f"] + core_names
 )
 df_Pv_static = comsol.read_df_from_comsol_table(
     link2file=os.path.join(
         paths.comsol_results,
-        f"measurement_validation_2025_10_01/core_losses_static.txt"
+        f"measurement_validation_2025_10_02/core_losses_static.txt"
     ),
     header=["f"] + core_names
 )
@@ -129,6 +129,10 @@ for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
     ax_dev.axhline(0, color="black", linestyle="--", linewidth=0.8)
     ax_dev.set_ylim(-70, 20)
     ax_dev.set_yticks([-60, -40, -20, 0, 20])
+
+    # Manufacturer deviation
+    # ax_dev.axhline(30, color="black", linestyle="--", linewidth=0.8)
+    # ax_dev.axhline(-30, color="black", linestyle="--", linewidth=0.8)
 
     # -------------------------
     # Highlight the difference
