@@ -153,6 +153,21 @@ for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
     # -------------------------
     ax_loss.set_title(core_name)
 
+    # -------------------------
+    # Mean deviations (in the recommended frequency range)
+    # -------------------------
+    f_rec = np.linspace(300, 1000, 20)  # in kHz
+    rec_p_meas_interp = np.interp(f_rec, f_meas, p_meas)
+    rec_p_fem_interp = np.interp(f_rec, f_fem, p_fem)
+    rec_p_fem_static_interp = np.interp(f_rec, f_fem_static, p_fem_static)
+    rec_dev_fem = (rec_p_fem_interp - rec_p_meas_interp) / rec_p_meas_interp
+    rec_dev_fem_static = (rec_p_fem_static_interp - rec_p_meas_interp) / rec_p_meas_interp
+    mean_dev_fem = np.mean(rec_dev_fem)
+    mean_dev_fem_static = np.mean(rec_dev_fem_static)
+    print(f"{core_name}")
+    print(f"Average deviation FEM         : {np.round(100*mean_dev_fem, 1)} %")
+    print(f"Average deviation FEM (static): {np.round(100*mean_dev_fem_static, 1)} %")
+
 # -------------------------
 # Labels, limits, legend
 # -------------------------
