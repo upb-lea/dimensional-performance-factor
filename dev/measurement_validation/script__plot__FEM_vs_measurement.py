@@ -42,6 +42,7 @@ cm = 1 / 2.54
 link2measurements = os.path.join(paths.measurements, "2025_08_18/")
 
 core_names = ["PQ2020", "PQ2625", "PQ4040"]
+core_names_for_plot = ["PQ20/20", "PQ26/25", "PQ40/40"]
 core_volumes = [2850 / 1e9, 6540 / 1e9, 17580 / 1e9]
 
 # -------------------------
@@ -151,7 +152,7 @@ for col, (core_name, core_volume) in enumerate(zip(core_names, core_volumes)):
     # -------------------------
     # Titles
     # -------------------------
-    ax_loss.set_title(core_name)
+    # ax_loss.set_title(core_names_for_plot[col])
 
     # -------------------------
     # Mean deviations (in the recommended frequency range)
@@ -193,7 +194,7 @@ for row in range(2):
 # Titles
 # -------------------------
 for col, core_name in enumerate(core_names):
-    axes[0, col].set_title(core_name)
+    axes[0, col].set_title(core_names_for_plot[col])
 
 
 # -------------------------

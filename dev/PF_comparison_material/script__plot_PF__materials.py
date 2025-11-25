@@ -109,7 +109,7 @@ for r_idx, R in enumerate(radii):
     # Axes formatting
     ax.set_ylim((0, max_y_tick))
     ax.set_xticks([250, 500, 750])
-    ax.set_xlabel(r"$f$ in kHz")
+    ax.set_xlabel(r"$f$ / kHz")
     ax.set_title(f"$R = {R*1000:.1f}$ mm ({core_label}/_)", fontsize=9)  # include core type
     ax.grid()
     ax.legend(loc="upper right", fontsize=8)

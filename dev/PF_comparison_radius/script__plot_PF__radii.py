@@ -57,11 +57,12 @@ for i, R in enumerate(R_):
     ax[1].plot(f_ / 1000, b_mean_static[i]*1000, "--", color=colors[i])
     ax[1].plot(f_ / 1000, b_mean_dim[i]*1000, label=f"$R$ = {R * 1000} mm", color=colors[i])
 
-line1 = matplotlib.lines.Line2D([0], [0], label=r"$2\uppi^2 R^2 \cdot \mathcal{P}\!\mathcal{F}$", color='k', dashes=(5, 2))
-line2 = matplotlib.lines.Line2D([0], [0], label=r"$\mathcal{P}\!\mathcal{F}^\mathrm{dim}$", color='k')
-legend1 = plt.legend(handles=[line1, line2], ncol=1, loc="upper left", bbox_to_anchor=(0, 2.28), fontsize=9)
-ax[1].legend(ncols=1, loc="upper right", bbox_to_anchor=(1, 1), fontsize=9)
-plt.gca().add_artist(legend1)
+# Legend
+ax[0].plot([], [], "--", color="gray", label=r"$2\uppi^2 R^2 \cdot \mathcal{P}\!\mathcal{F}$")
+ax[0].plot([], [], color="gray", label=r"$\mathcal{P}\!\mathcal{F}^\mathrm{dim}$")
+ax[0].legend(ncols=1, fontsize=9)
+ax[1].legend(ncols=1, fontsize=9)
+
 
 # -------------------------
 # Connect maxima in upper plot and label as f_opt and f_opt^static
@@ -114,7 +115,7 @@ ax[1].set_ylim((0, 160))
 
 ax[0].set_ylabel(r"$2 \uppi  f \cdot |\underline{\mathit{\Phi}}|$ / V")
 ax[1].set_ylabel(r"$|\underline{\mathit{\Phi}}| / (\pi R^2)$ / mT")
-ax[1].set_xlabel(r"$f$ in kHz")
+ax[1].set_xlabel(r"$f$ / kHz")
 # ax.set_title(f"Performance Factors at {int(pv_limit/1000)} kW/m³")
 ax[0].grid()
 ax[1].grid()
