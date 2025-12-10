@@ -9,7 +9,7 @@ import os
 import logging
 import numpy as np
 
-from utils import comsol_interface as comsol
+from hybridmag.utils import comsol_interface as comsol
 from meta import paths
 
 # -------------------------

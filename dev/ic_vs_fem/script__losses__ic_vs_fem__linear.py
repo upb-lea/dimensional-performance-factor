@@ -3,7 +3,7 @@ import os.path
 import matplotlib
 
 from utils import infinite_cylinder as ic
-from utils import comsol_interface as comsol
+from hybridmag.utils import comsol_interface as comsol
 from utils.physics import *
 from utils.maths import *
 from matplotlib import pyplot as plt

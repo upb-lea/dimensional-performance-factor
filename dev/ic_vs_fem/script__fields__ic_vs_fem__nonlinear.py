@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 from utils import infinite_cylinder as ic
 from utils import material_processing as materials
-from utils import comsol_interface as comsol
+from hybridmag.utils import comsol_interface as comsol
 from utils.physics import *
 from utils.maths import *
 from meta.plot_settings import colors
