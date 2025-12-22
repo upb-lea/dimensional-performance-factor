@@ -61,6 +61,7 @@ for i, R in enumerate(R_):
     b_mean_dim_f = []
     PF_static_f = []
     b_mean_static_f = []
+    max_dev = 1e-6
     for f in f_:
         print(f"\n{f = }")
         # -------------------------
@@ -81,20 +82,33 @@ for i, R in enumerate(R_):
         # Static model
         # -------------------------
         A = 0  # exciting static magnetic field strength amplitude in A/m
-        A_increment = 0.01  # excitation step size in A/m
+        A_increment = 10  # excitation step size in A/m
         pv_reached = False
         while not pv_reached:
-            A = A + A_increment
-
             pv_mag_static = f_pv_mag(f, mu_h(abs(A)).imag, np.abs(A))
-            if pv_mag_static > pv_limit:
-                pv_reached = True
-            B_static = mu_h(abs(A)) * A
-            # no integral is needed here, because field is constant:
-            complex_flux_static = B_static * np.pi * R ** 2  # alt.: integrate_2d_axi_symmetry_field(r_, B_static)
 
-            PF_static_f_op = 2 * np.pi * f * abs(complex_flux_static)
-            b_mean_static_f_op = abs(complex_flux_static) / np.pi / R ** 2
+            if abs(pv_limit - pv_mag_static) / pv_limit < max_dev:
+                # print(f"{pv_limit = }")
+                # print(f"{pv_mag_static = }")
+                B_static = mu_h(abs(A)) * A
+                # no integral is needed here, because field is constant:
+                complex_flux_static = B_static * np.pi * R ** 2  # alt.: integrate_2d_axi_symmetry_field(r_, B_static)
+
+                PF_static_f_op = 2 * np.pi * f * abs(complex_flux_static)
+                b_mean_static_f_op = abs(complex_flux_static) / np.pi / R ** 2
+
+                pv_reached = True
+
+            if (pv_mag_static < pv_limit) and (A_increment > 0):
+                A = A + A_increment
+            elif (pv_mag_static > pv_limit) and (A_increment < 0):
+                A = A + A_increment
+            elif (pv_mag_static > pv_limit) and (A_increment > 0):
+                A_increment = -A_increment / 2
+                A = A + A_increment
+            else:
+                A_increment = -A_increment / 2
+                A = A + A_increment
 
         PF_static_f.append(PF_static_f_op)
         b_mean_static_f.append(b_mean_static_f_op)
@@ -107,25 +121,43 @@ for i, R in enumerate(R_):
         r_, H_, E_ = ic.r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_h(abs(A)))
         complex_flux_ic = integrate_2d_axi_symmetry_field(r_, mu_h(abs(H_)) * H_)
 
-        A = 0  # exciting static magnetic field strength amplitude in A/m
+        A = 1  # exciting static magnetic field strength amplitude in A/m
+        A_increment = 10  # excitation step size in A/m
         pv_reached = False
         while not pv_reached:
-            A = A + A_increment
+            # print(f"{A = }")
+
             r_, H_, E_ = ic.r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_h(np.mean(abs(H_))))
             complex_flux_ic = integrate_2d_axi_symmetry_field(r_, mu_h(abs(H_)) * H_)
 
-            # -------------------------
-            # Post-Processing
-            # -------------------------
             pv_mag_ic = f_pv_mag(f, mu_h(abs(H_)).imag, np.abs(H_))
             pv_el_ic = f_pv_el(f, eps.imag, np.abs(E_))
             mean_pv_ic = (integrate_2d_axi_symmetry_field(r_, pv_mag_ic) +
                           integrate_2d_axi_symmetry_field(r_, pv_el_ic)) / (np.pi * R ** 2)
 
-            if mean_pv_ic > pv_limit:
+            if abs(pv_limit - mean_pv_ic) / pv_limit < max_dev:
+                # print(f"{pv_limit = }")
+                # print(f"{pv_mag_static = }")
+
+                # -------------------------
+                # Post-Processing
+                # -------------------------
+                PF_dim_f_op = 2 * np.pi * f * abs(complex_flux_ic)
+                b_mean_dim_f_op = abs(complex_flux_ic) / np.pi / R ** 2
+
                 pv_reached = True
-            PF_dim_f_op = 2 * np.pi * f * abs(complex_flux_ic)
-            b_mean_dim_f_op = abs(complex_flux_ic) / np.pi / R ** 2
+
+            if (mean_pv_ic < pv_limit) and (A_increment > 0):
+                A = A + A_increment
+            elif (mean_pv_ic > pv_limit) and (A_increment < 0):
+                A = A + A_increment
+            elif (mean_pv_ic > pv_limit) and (A_increment > 0):
+                A_increment = -A_increment / 2
+                A = A + A_increment
+            else:
+                A_increment = -A_increment / 2
+                A = A + A_increment
+
         print(f"{A = } (IC)")
 
         PF_dim_f.append(PF_dim_f_op)
