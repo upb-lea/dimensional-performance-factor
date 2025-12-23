@@ -62,14 +62,16 @@ all_freqs = []
 df_Pv = comsol.read_df_from_comsol_table(
     link2file=os.path.join(
         paths.comsol_results,
-        f"measurement_validation_2025_10_02/core_losses.txt"
+        # f"measurement_validation_2025_10_02/core_losses.txt"
+        f"measurement_validation_2025_12_23/core_losses.txt"
     ),
     header=["f"] + core_names
 )
 df_Pv_static = comsol.read_df_from_comsol_table(
     link2file=os.path.join(
         paths.comsol_results,
-        f"measurement_validation_2025_10_02/core_losses_static.txt"
+        # f"measurement_validation_2025_10_02/core_losses_static.txt"
+        f"measurement_validation_2025_12_23/core_losses_static.txt"
     ),
     header=["f"] + core_names
 )
