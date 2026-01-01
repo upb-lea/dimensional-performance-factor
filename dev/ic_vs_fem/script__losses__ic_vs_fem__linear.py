@@ -16,13 +16,14 @@ from meta import paths
 # -------------------------
 plt.rcParams.update({
     "text.usetex": True,
-    "font.family": "Bitstream Vera Sans",
-    'font.size': 10.0,
-    'text.latex.preamble': r"\usepackage{upgreek}",
-    'mathtext.fontset': 'custom',
-    'mathtext.rm': 'Bitstream Vera Serif',
-    'mathtext.it': 'Bitstream Vera Serif:italic',
-    'mathtext.bf': 'Bitstream Vera Serif:bold'
+    "font.family": "serif",
+    "font.sans-serif": ["Bitstream Vera Sans", "DejaVu Sans", "Helvetica", "Arial", "sans-serif"],
+    "font.size": 10.0,
+    "text.latex.preamble": r"\usepackage{upgreek}\usepackage{siunitx}",
+    "mathtext.fontset": "custom",
+    "mathtext.rm": "Bitstream Vera Serif",
+    "mathtext.it": "Bitstream Vera Serif:italic",
+    "mathtext.bf": "Bitstream Vera Serif:bold"
 })
 
 # -------------------------
@@ -158,7 +159,7 @@ ax.fill_betweenx([y_min, y_max], f_min_kHz, f_max_kHz, color='gray', alpha=0.3)
 ax.text(
     f_min_kHz,
     y_min,
-    "recommended\nfrequency range\n(from TDK)",
+    "manufacturer\nfrequency range\n(by TDK)",
     ha='left', va='bottom',
     fontsize=9, color='black'
 )
