@@ -1,5 +1,6 @@
 from scipy import special
 from utils.maths import *
+from utils.physics import *
 
 
 def r_h_e_linear(R, f, A, eps: complex, mu: complex, print_wavelength=False):
@@ -21,8 +22,45 @@ def r_h_e_linear(R, f, A, eps: complex, mu: complex, print_wavelength=False):
     H_ = A * special.jv(0, k_ * r_) / special.jv(0, k_ * R)
     E_ = A * k_ / (j * 2 * np.pi * f * permittivity) * special.jv(1, k_ * r_) / special.jv(0, k_ * R)
     if print_wavelength:
-        wavelength = 2*np.pi/k_.real
-        print(f"wavelength at {f} Hz: {wavelength*1000} mm")
-        print(f"diameter-to-wavelength ratio at {f} Hz: {2*R/wavelength}")
+        wavelength = 2 * np.pi / k_.real
+        print(f"wavelength at {f} Hz: {wavelength * 1000} mm")
+        print(f"diameter-to-wavelength ratio at {f} Hz: {2 * R / wavelength}")
     return r_, H_, E_
 
+
+def pv_linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
+    """
+    Compute the mean-cross-sectional core loss density of a cylinder with radius R.
+
+    :param R: radius [m]
+    :param f: frequency [Hz]
+    :param b_mean: mean-cross-sectional mag. flux density (peak value) [Hz]
+    :param eps: complex permittivity
+    :param mu: complex permeability
+    :param rel_tol: relative tolerance of the total magnetic flux through the cross-section
+    :return: mean-cross-sectional core loss density
+    """
+    flux_selected = b_mean * np.pi * R ** 2
+
+    # init step
+    A = 1
+    r_, H_, E_ = r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu)
+    flux_ic = integrate_2d_axi_symmetry_field(r_, mu * H_)
+
+    # iterative rescaling
+    while abs(flux_selected - abs(flux_ic)) / flux_selected > rel_tol:
+        A *= flux_selected / abs(flux_ic)
+        r_, H_, E_ = r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu)
+        flux_ic = integrate_2d_axi_symmetry_field(r_, mu * H_)
+
+    # Rel. Deviation from selected flux
+    # print(f"Rel. Deviation from selected flux {abs(flux_selected - abs(flux_ic)) / flux_selected}")
+
+    # mag. loss density over the radius r_
+    pv_mag = f_pv_mag(f, mu.imag, np.abs(H_))
+    # el. loss density over the radius r_
+    pv_el = f_pv_el(f, eps.imag, np.abs(E_))
+
+    # return the mean-cross-sectional core loss density
+    return (integrate_2d_axi_symmetry_field(r_, pv_mag) +
+            integrate_2d_axi_symmetry_field(r_, pv_el)) / (np.pi * R ** 2)
