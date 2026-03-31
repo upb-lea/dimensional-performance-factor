@@ -74,7 +74,7 @@ def pv_non_linear(R, f, b_mean, eps, mu_of_h, rel_tol=1e-6):
     :param f: frequency [Hz]
     :param b_mean: mean-cross-sectional mag. flux density (peak value) [Hz]
     :param eps: constant complex permittivity
-    :param mu: flux-dependent complex permeability
+    :param mu_of_h: flux-dependent complex permeability
     :param rel_tol: relative tolerance of the total magnetic flux through the cross-section
     :return: mean-cross-sectional core loss density
     """
