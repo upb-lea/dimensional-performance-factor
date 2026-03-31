@@ -35,8 +35,8 @@ def pv_linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
     :param R: radius [m]
     :param f: frequency [Hz]
     :param b_mean: mean-cross-sectional mag. flux density (peak value) [Hz]
-    :param eps: complex permittivity
-    :param mu: complex permeability
+    :param eps: constant complex permittivity
+    :param mu: constant complex permeability
     :param rel_tol: relative tolerance of the total magnetic flux through the cross-section
     :return: mean-cross-sectional core loss density
     """
@@ -58,6 +58,45 @@ def pv_linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
 
     # mag. loss density over the radius r_
     pv_mag = f_pv_mag(f, mu.imag, np.abs(H_))
+    # el. loss density over the radius r_
+    pv_el = f_pv_el(f, eps.imag, np.abs(E_))
+
+    # return the mean-cross-sectional core loss density
+    return (integrate_2d_axi_symmetry_field(r_, pv_mag) +
+            integrate_2d_axi_symmetry_field(r_, pv_el)) / (np.pi * R ** 2)
+
+
+def pv_non_linear(R, f, b_mean, eps, mu_of_h, rel_tol=1e-6):
+    """
+    Compute the mean-cross-sectional core loss density of a cylinder with radius R.
+
+    :param R: radius [m]
+    :param f: frequency [Hz]
+    :param b_mean: mean-cross-sectional mag. flux density (peak value) [Hz]
+    :param eps: constant complex permittivity
+    :param mu: flux-dependent complex permeability
+    :param rel_tol: relative tolerance of the total magnetic flux through the cross-section
+    :return: mean-cross-sectional core loss density
+    """
+    flux_selected = b_mean * np.pi * R ** 2
+
+    # init step
+    # init permeability with static result:
+    A = 1
+    r_, H_, E_ = r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_of_h(abs(A)))
+    flux_ic = integrate_2d_axi_symmetry_field(r_, mu_of_h(abs(H_)) * H_)
+
+    # iterative rescaling
+    while abs(flux_selected - abs(flux_ic)) / flux_selected > rel_tol:
+        A *= flux_selected / abs(flux_ic)
+        r_, H_, E_ = r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_of_h(abs(A)))
+        flux_ic = integrate_2d_axi_symmetry_field(r_, mu_of_h(abs(H_)) * H_)
+
+    # Rel. Deviation from selected flux
+    # print(f"Rel. Deviation from selected flux {abs(flux_selected - abs(flux_ic)) / flux_selected}")
+
+    # mag. loss density over the radius r_
+    pv_mag = f_pv_mag(f, mu_of_h(abs(H_)).imag, np.abs(H_))
     # el. loss density over the radius r_
     pv_el = f_pv_el(f, eps.imag, np.abs(E_))
 
