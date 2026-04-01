@@ -28,7 +28,7 @@ def r_h_e_linear(R, f, A, eps: complex, mu: complex, print_wavelength=False):
     return r_, H_, E_
 
 
-def pv_linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
+def pv_from_b_mean__linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
     """
     Compute the mean-cross-sectional core loss density of a cylinder with radius R.
 
@@ -66,7 +66,7 @@ def pv_linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
             integrate_2d_axi_symmetry_field(r_, pv_el)) / (np.pi * R ** 2)
 
 
-def pv_non_linear(R, f, b_mean, eps, mu_of_h, rel_tol=1e-6):
+def pv_from_b_mean__non_linear(R, f, b_mean, eps, mu_of_h, rel_tol=1e-6):
     """
     Compute the mean-cross-sectional core loss density of a cylinder with radius R.
 
