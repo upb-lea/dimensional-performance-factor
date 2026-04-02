@@ -14,7 +14,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 # -------------------------
 T_c = 70  # temperature
 f_ = np.linspace(1e5, 1e6, 30)
-R_ = [0.004, 0.006, 0.0075, 0.01]
+R_ = [0.0044, 0.006, 0.0075, 0.01]
 
 
 pv_limit = 300000
