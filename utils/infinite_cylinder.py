@@ -6,13 +6,12 @@ from utils.physics import *
 def r_h_e_linear(R, f, A, eps: complex, mu: complex, print_wavelength=False):
     """
 
-    :param R:
-    :param f:
-    :param A:
-    :param print_wavelength:
+    :param R: radius in m
+    :param f: frequency in Hz
+    :param A: current sheet - magnetic field excitation in A/m
     :param eps: complex permittivity (not the relative permittivity)
-    :param mu_of_h: complex permeability (not the relative permeability)
-    :param n_runs:
+    :param mu: complex permeability (not the relative permeability)
+    :param print_wavelength: yes or no
     :return:
     """
     permittivity = eps
@@ -58,26 +57,27 @@ def pv_from_b_mean__linear(R, f, b_mean, eps, mu, rel_tol=1e-3):
 
     # mag. loss density over the radius r_
     pv_mag = f_pv_mag(f, mu.imag, np.abs(H_))
+
     # el. loss density over the radius r_
     pv_el = f_pv_el(f, eps.imag, np.abs(E_))
 
     # return the mean-cross-sectional core loss density
-    return mean_pv(r_, pv_mag, pv_el)
+    return mean_pv_cyl(r_, pv_mag, pv_el)
 
 
-def pv_from_b_mean__non_linear(R, f, b_mean, eps, mu_of_h, rel_tol=1e-6):
+def pv_from_b_mean__non_linear(b_mean_selected, R, f, eps, mu_of_h, rel_tol=1e-6):
     """
     Compute the mean-cross-sectional core loss density of a cylinder with radius R.
 
+    :param b_mean_selected: mean-cross-sectional mag. flux density (peak value) [Hz]
     :param R: radius [m]
     :param f: frequency [Hz]
-    :param b_mean: mean-cross-sectional mag. flux density (peak value) [Hz]
     :param eps: constant complex permittivity
     :param mu_of_h: flux-dependent complex permeability
     :param rel_tol: relative tolerance of the total magnetic flux through the cross-section
     :return: mean-cross-sectional core loss density
     """
-    flux_selected = b_mean * np.pi * R ** 2
+    flux_selected = b_mean_selected * np.pi * R ** 2
 
     # init step
     # init permeability with static result:
@@ -96,14 +96,22 @@ def pv_from_b_mean__non_linear(R, f, b_mean, eps, mu_of_h, rel_tol=1e-6):
 
     # mag. loss density over the radius r_
     pv_mag = f_pv_mag(f, mu_of_h(abs(H_)).imag, np.abs(H_))
+
     # el. loss density over the radius r_
     pv_el = f_pv_el(f, eps.imag, np.abs(E_))
 
     # return the mean-cross-sectional core loss density
-    return mean_pv(r_, pv_mag, pv_el)
+    return mean_pv_cyl(r_, pv_mag, pv_el)
 
-def mean_pv(r_, pv_mag, pv_el):
+def mean_pv_cyl(r_, pv_mag, pv_el):
+    """
+    Calculate the mean cross-sectional core loss density of a cylinder with radius R.
 
+    :param r_: radius vector in m
+    :param pv_mag: mag. loss density vector in m
+    :param pv_el: el. loss density vector in m
+    :return:
+    """
     R = max(r_)
     # return the mean-cross-sectional core loss density
     return (integrate_2d_axi_symmetry_field(r_, pv_mag) +
@@ -113,7 +121,7 @@ def flux_from_pv__non_linear(pv_selected, R, f, eps, mu_of_h, rel_tol=1e-3):
     """
     Compute the mean-cross-sectional core loss density of a cylinder with radius R.
 
-    :param pv: mean-cross-sectional loss density [W/m^3]
+    :param pv_selected: mean-cross-sectional loss density [W/m^3]
     :param R: radius [m]
     :param f: frequency [Hz]
     :param eps: constant complex permittivity
@@ -132,7 +140,7 @@ def flux_from_pv__non_linear(pv_selected, R, f, eps, mu_of_h, rel_tol=1e-3):
     pv_el = f_pv_el(f, eps.imag, np.abs(E_))
 
     # mean total core loss density
-    pv_mean = mean_pv(r_, pv_mag, pv_el)
+    pv_mean = mean_pv_cyl(r_, pv_mag, pv_el)
 
     relax = 0.4
     # iterative rescaling
@@ -149,7 +157,7 @@ def flux_from_pv__non_linear(pv_selected, R, f, eps, mu_of_h, rel_tol=1e-3):
         pv_el = f_pv_el(f, eps.imag, np.abs(E_))
 
         # mean total core loss density
-        pv_mean = mean_pv(r_, pv_mag, pv_el)
+        pv_mean = mean_pv_cyl(r_, pv_mag, pv_el)
 
     flux_ic = integrate_2d_axi_symmetry_field(r_, mu_of_h(abs(H_)) * H_)
 
