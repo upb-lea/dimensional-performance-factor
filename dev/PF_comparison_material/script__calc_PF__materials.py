@@ -15,22 +15,20 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 # -------------------------
 # Problem definition
 # -------------------------
-T_c = 70  # temperature
-pv_limit = 300000
+T_c = 70  # # temperature in C
+pv_limit = 300000  # loss density in W/m^3
 
 materials = [
     mdb.Material._3F46,
-    # mdb.Material.PC200,
     mdb.Material.N49,
-    # mdb.Material.N87,
     mdb.Material.N95,
 ]
 
-# R_ = [0.004, 0.006, 0.0075, 0.01]   # radii in m
 R_ = [0.0044, 0.0075, 0.01, 0.013]   # radii in m
 core_type = ["PQ20", "PQ40", "PQ50", "PQ65"]   # radii in m
 
 # Example structure: {material: {R: frequency_array}}
+# frequency in Hz
 frequency_resolution = 30
 freqs_per_material = {
     mdb.Material._3F46: {
@@ -108,38 +106,23 @@ for material in materials:
             # -------------------------
             # Material fit at temperature and frequency
             # -------------------------
+            # Permeability:
             mu_real, mu_imag = complex_permeability.fit_real_and_imaginary_part_at_f_and_T(
                 f_op=f, T_op=T_c, b_vals=np.linspace(0, 0.2, 50)
             )
+            # an interpolation in terms of the magnetic field h is needed:
             mu_h = material_functions.mu_h_from_mu_b((mu_real - j * mu_imag) * mu_0, b_common)
 
+            # Permittivity:
             eps_real, eps_imag = complex_permittivity.fit_real_and_imaginary_part_at_f_and_T(f=f, T=T_c)
             eps = epsilon_0 * (eps_real - complex(0, 1) * eps_imag)
 
             # -------------------------
             # Static model
             # -------------------------
-            # A = 0
-            # A_increment = 0.01
-            # pv_reached = False
-            # while not pv_reached:
-            #     A += A_increment
-            #     pv_mag_static = f_pv_mag(f, mu_h(abs(A)).imag, np.abs(A))
-            #     if pv_mag_static > pv_limit:
-            #         pv_reached = True
-            #     B_static = mu_h(abs(A)) * A
-            #     complex_flux_static = B_static * np.pi * R**2
-            #
-            #     PF_static_f_op = 2 * np.pi * f * abs(complex_flux_static)
-            #     b_mean_static_f_op = abs(complex_flux_static) / (np.pi * R**2)
-            #
-            # PF_static_f.append(PF_static_f_op)
-            # b_mean_static_f.append(b_mean_static_f_op)
-            # print(f"      {A = } (static)")
             flux_static = ic.flux_from_pv__non_linear(pv_limit, R, f, epsilon_0, mu_h)
             PF_static_f.append(2 * np.pi * f * abs(flux_static))
             b_mean_static_f.append(abs(flux_static) / np.pi / R**2)
-
 
             # -------------------------
             # IC model
@@ -147,7 +130,6 @@ for material in materials:
             flux_ic = ic.flux_from_pv__non_linear(pv_limit, R, f, eps, mu_h)
             PF_dim_f.append(2 * np.pi * f * abs(flux_ic))
             b_mean_dim_f.append(abs(flux_ic) / np.pi / R**2)
-            # print(f"      {A = } (IC)")
 
         # append results for this radius
         PF_static_r.append(PF_static_f)
@@ -162,7 +144,7 @@ for material in materials:
     b_mean_dim.append(b_mean_dim_r)
 
 # -------------------------
-# Store Results (optimized structure)
+# Store Results
 # -------------------------
 results = {
     "temperature": T_c,

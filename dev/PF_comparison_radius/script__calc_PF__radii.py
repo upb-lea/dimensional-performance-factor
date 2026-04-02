@@ -12,12 +12,12 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 # -------------------------
 # Problem definition
 # -------------------------
-T_c = 70  # temperature
-f_ = np.linspace(1e5, 1e6, 30)
-R_ = [0.0044, 0.006, 0.0075, 0.01]
+T_c = 70  # temperature in C
+f_ = np.linspace(1e5, 1e6, 30)  # frequency in Hz
+R_ = [0.0044, 0.006, 0.0075, 0.01]  # radii in m
 
 
-pv_limit = 300000
+pv_limit = 300000  # loss density in W/m^3
 PF_tdk = []
 
 PF_dim = []
@@ -50,7 +50,7 @@ complex_permittivity.fit_loss_angle()
 # Performance Factor
 # -------------------------
 for i, R in enumerate(R_):
-    print(f"\n{R = }\n")
+    print(f"  radius = {R}, frequencies = {f_}")
     r_ = np.linspace(0, R, 20)  # this is duplicated as a workaround for the static case with the static
     PF_dim_f = []
     b_mean_dim_f = []
@@ -58,7 +58,7 @@ for i, R in enumerate(R_):
     b_mean_static_f = []
     max_dev = 1e-6
     for f in f_:
-        print(f"\n{f = }")
+        print(f"    {f = }")
         # -------------------------
         # Material fit at temperature and frequency
         # -------------------------
