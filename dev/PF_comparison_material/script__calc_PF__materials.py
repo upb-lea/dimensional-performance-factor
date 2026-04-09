@@ -89,8 +89,7 @@ for material in materials:
         material=material,
         data_source=mdb.DataSource.LEA_MTB
     )
-    complex_permittivity.fit_permittivity_magnitude()
-    complex_permittivity.fit_loss_angle()
+    complex_permittivity.fit_sigma()
 
     PF_dim_r = []
     b_mean_dim_r = []

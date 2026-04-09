@@ -44,8 +44,7 @@ b_common = np.linspace(0, 0.2, 50)
 complex_permittivity = mdb_data.get_complex_permittivity(material=mdb.Material.N49,
                                                          data_source=mdb.DataSource.LEA_MTB)
 print(f"\nComplex permittivity data: \n {complex_permittivity.measurement_data} \n ")
-complex_permittivity.fit_permittivity_magnitude()
-complex_permittivity.fit_loss_angle()
+complex_permittivity.fit_sigma()
 
 # -------------------------
 # Performance Factor
