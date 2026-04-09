@@ -13,7 +13,7 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 # Problem definition
 # -------------------------
 T_c = 70  # temperature in C
-f_ = np.linspace(1e5, 1e6, 30)  # frequency in Hz
+f_ = np.linspace(1e5, 1e6, 60)  # frequency in Hz
 R_ = [0.0044, 0.006, 0.0075, 0.01]  # radii in m
 
 
@@ -34,7 +34,8 @@ mdb_data = mdb.Data()
 
 complex_permeability = mdb_data.get_complex_permeability(material=mdb.Material.N49,
                                                          data_source=mdb.DataSource.LEA_MTB,
-                                                         pv_fit_function=mdb.FitFunction.enhancedSteinmetz)
+                                                         pv_fit_function=mdb.FitFunction.enhancedSteinmetz,
+                                                         probe_codes=["R16x9.6x6.3"])
 print(f"\nComplex permeability data: \n {complex_permeability.measurement_data} \n")
 complex_permeability.fit_losses()
 complex_permeability.fit_permeability_magnitude()

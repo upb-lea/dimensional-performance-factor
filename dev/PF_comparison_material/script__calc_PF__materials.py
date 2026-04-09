@@ -24,6 +24,12 @@ materials = [
     mdb.Material.N95,
 ]
 
+probe_codes_per_material = {
+    mdb.Material.N95: ["R29.5x19x14.9"],
+    mdb.Material.N49: ["R16x9.6x6.3"],
+    mdb.Material._3F46: ["R25x15x10"]
+}
+
 R_ = [0.0044, 0.0075, 0.01, 0.013]   # radii in m
 core_type = ["PQ20", "PQ40", "PQ50", "PQ65"]   # radii in m
 
@@ -34,8 +40,8 @@ freqs_per_material = {
     mdb.Material._3F46: {
         0.0044: np.linspace(1e5, 3e6, frequency_resolution),
         0.0075: np.linspace(1e5, 2e6, frequency_resolution),
-        0.01: np.linspace(1e5, 1.5e6, frequency_resolution),
-        0.013: np.linspace(1e5, 1.2e6, frequency_resolution)
+        0.01: np.linspace(1e5, 1.4e6, frequency_resolution),
+        0.013: np.linspace(1e5, 1.1e6, frequency_resolution)
     },
     mdb.Material.N49: {
         0.0044: np.linspace(1e5, 1e6, frequency_resolution),
@@ -72,7 +78,8 @@ for material in materials:
     complex_permeability = mdb_data.get_complex_permeability(
         material=material,
         data_source=mdb.DataSource.LEA_MTB,
-        pv_fit_function=mdb.FitFunction.enhancedSteinmetz
+        pv_fit_function=mdb.FitFunction.enhancedSteinmetz,
+        probe_codes=probe_codes_per_material[material]
     )
     complex_permeability.fit_losses()
     complex_permeability.fit_permeability_magnitude()
