@@ -103,6 +103,37 @@ def pv_from_b_mean__non_linear(b_mean_selected, R, f, eps, mu_of_h, rel_tol=1e-6
     # return the mean-cross-sectional core loss density
     return mean_pv_cyl(r_, pv_mag, pv_el)
 
+
+def r_h_e_from_b_mean__non_linear(b_mean_selected, R, f, eps, mu_of_h, rel_tol=1e-6):
+    """
+    Compute magnetic and electric fields in a cylinder with radius R.
+
+    :param b_mean_selected: mean-cross-sectional mag. flux density (peak value) [Hz]
+    :param R: radius [m]
+    :param f: frequency [Hz]
+    :param eps: constant complex permittivity
+    :param mu_of_h: flux-dependent complex permeability
+    :param rel_tol: relative tolerance of the total magnetic flux through the cross-section
+    :return: mean-cross-sectional core loss density
+    """
+    flux_selected = b_mean_selected * np.pi * R ** 2
+
+    # init step
+    # init permeability with static result:
+    A = 1
+    r_, H_, E_ = r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_of_h(abs(A)))
+    flux_ic = integrate_2d_axi_symmetry_field(r_, mu_of_h(abs(H_)) * H_)
+
+    # iterative rescaling
+    while abs(flux_selected - abs(flux_ic)) / flux_selected > rel_tol:
+        A *= flux_selected / abs(flux_ic)
+        r_, H_, E_ = r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_of_h(abs(A)))
+        flux_ic = integrate_2d_axi_symmetry_field(r_, mu_of_h(abs(H_)) * H_)
+
+    # return the field quantities
+    return r_, H_, E_
+
+
 def mean_pv_cyl(r_, pv_mag, pv_el):
     """
     Calculate the mean cross-sectional core loss density of a cylinder with radius R.
