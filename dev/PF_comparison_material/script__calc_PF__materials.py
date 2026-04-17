@@ -26,7 +26,7 @@ materials = [
 
 probe_codes_per_material = {
     mdb.Material.N95: ["R29.5x19x14.9"],
-    mdb.Material.N49: ["R16x9.6x6.3"],
+    mdb.Material.N49: None,
     mdb.Material._3F46: ["R25x15x10"]
 }
 

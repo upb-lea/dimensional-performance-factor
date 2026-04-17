@@ -35,7 +35,7 @@ mdb_data = mdb.Data()
 complex_permeability = mdb_data.get_complex_permeability(material=mdb.Material.N49,
                                                          data_source=mdb.DataSource.LEA_MTB,
                                                          pv_fit_function=mdb.FitFunction.enhancedSteinmetz,
-                                                         probe_codes=["R16x9.6x6.3"])
+                                                         probe_codes=None)
 print(f"\nComplex permeability data: \n {complex_permeability.measurement_data} \n")
 complex_permeability.fit_losses()
 complex_permeability.fit_permeability_magnitude()
