@@ -15,35 +15,46 @@ logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
 # -------------------------
 # Problem definition
 # -------------------------
-T_c = 100  # temperature
-pv_limit = 300000
+T_c = 70  # # temperature in C
+pv_limit = 300000  # loss density in W/m^3
 
 materials = [
-    # mdb.Material.PC200,
+    mdb.Material._3F46,
     mdb.Material.N49,
-    # mdb.Material.N87,
-    mdb.Material.N95
+    mdb.Material.N95,
 ]
 
-# R_ = [0.004, 0.006, 0.0075, 0.01]   # radii in m
+probe_codes_per_material = {
+    mdb.Material.N95: ["R29.5x19x14.9"],
+    mdb.Material.N49: None,
+    mdb.Material._3F46: ["R25x15x10"]
+}
+
 R_ = [0.0044, 0.0075, 0.01, 0.013]   # radii in m
 core_type = ["PQ20", "PQ40", "PQ50", "PQ65"]   # radii in m
 
 # Example structure: {material: {R: frequency_array}}
+# frequency in Hz
 frequency_resolution = 30
 freqs_per_material = {
+    mdb.Material._3F46: {
+        0.0044: np.linspace(1e5, 3e6, frequency_resolution),
+        0.0075: np.linspace(1e5, 2e6, frequency_resolution),
+        0.01: np.linspace(1e5, 1.4e6, frequency_resolution),
+        0.013: np.linspace(1e5, 1.1e6, frequency_resolution)
+    },
     mdb.Material.N49: {
-        0.0044: np.linspace(1e5, 8e5, frequency_resolution),
-        0.0075: np.linspace(1e5, 7e5, frequency_resolution),
-        0.01: np.linspace(1e5, 6e5, frequency_resolution),
-        0.013: np.linspace(1e5, 4e5, frequency_resolution)
+        0.0044: np.linspace(1e5, 1e6, frequency_resolution),
+        0.0075: np.linspace(1e5, 9e5, frequency_resolution),
+        0.01: np.linspace(1e5, 8e5, frequency_resolution),
+        0.013: np.linspace(1e5, 6e5, frequency_resolution)
     },
     mdb.Material.N95: {
-        0.0044: np.linspace(1e5, 7e5, frequency_resolution),
-        0.0075: np.linspace(1e5, 5e5, frequency_resolution),
-        0.01: np.linspace(1e5, 4e5, frequency_resolution),
-        0.013: np.linspace(1e5, 3e5, frequency_resolution)
-    }
+        0.0044: np.linspace(1e5, 9e5, frequency_resolution),
+        0.0075: np.linspace(1e5, 7e5, frequency_resolution),
+        0.01: np.linspace(1e5, 5e5, frequency_resolution),
+        0.013: np.linspace(1e5, 4e5, frequency_resolution)
+    },
 }
 
 
@@ -66,8 +77,9 @@ for material in materials:
     # Prepare material models ...
     complex_permeability = mdb_data.get_complex_permeability(
         material=material,
-        data_source=mdb.DataSource.TDK_MDT,
-        pv_fit_function=mdb.FitFunction.enhancedSteinmetz
+        data_source=mdb.DataSource.LEA_MTB,
+        pv_fit_function=mdb.FitFunction.enhancedSteinmetz,
+        probe_codes=probe_codes_per_material[material]
     )
     complex_permeability.fit_losses()
     complex_permeability.fit_permeability_magnitude()
@@ -77,8 +89,7 @@ for material in materials:
         material=material,
         data_source=mdb.DataSource.LEA_MTB
     )
-    complex_permittivity.fit_permittivity_magnitude()
-    complex_permittivity.fit_loss_angle()
+    complex_permittivity.fit_sigma()
 
     PF_dim_r = []
     b_mean_dim_r = []
@@ -101,63 +112,30 @@ for material in materials:
             # -------------------------
             # Material fit at temperature and frequency
             # -------------------------
+            # Permeability:
             mu_real, mu_imag = complex_permeability.fit_real_and_imaginary_part_at_f_and_T(
                 f_op=f, T_op=T_c, b_vals=np.linspace(0, 0.2, 50)
             )
+            # an interpolation in terms of the magnetic field h is needed:
             mu_h = material_functions.mu_h_from_mu_b((mu_real - j * mu_imag) * mu_0, b_common)
 
+            # Permittivity:
             eps_real, eps_imag = complex_permittivity.fit_real_and_imaginary_part_at_f_and_T(f=f, T=T_c)
             eps = epsilon_0 * (eps_real - complex(0, 1) * eps_imag)
 
             # -------------------------
             # Static model
             # -------------------------
-            A = 0
-            A_increment = 0.01
-            pv_reached = False
-            while not pv_reached:
-                A += A_increment
-                pv_mag_static = f_pv_mag(f, mu_h(abs(A)).imag, np.abs(A))
-                if pv_mag_static > pv_limit:
-                    pv_reached = True
-                B_static = mu_h(abs(A)) * A
-                complex_flux_static = B_static * np.pi * R**2
-
-                PF_static_f_op = 2 * np.pi * f * abs(complex_flux_static)
-                b_mean_static_f_op = abs(complex_flux_static) / (np.pi * R**2)
-
-            PF_static_f.append(PF_static_f_op)
-            b_mean_static_f.append(b_mean_static_f_op)
-            print(f"      {A = } (static)")
+            flux_static = ic.flux_from_pv__non_linear(pv_limit, R, f, epsilon_0, mu_h)
+            PF_static_f.append(2 * np.pi * f * abs(flux_static))
+            b_mean_static_f.append(abs(flux_static) / np.pi / R**2)
 
             # -------------------------
             # IC model
             # -------------------------
-            r_, H_, E_ = ic.r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_h(abs(A)))
-            complex_flux_ic = integrate_2d_axi_symmetry_field(r_, mu_h(abs(H_)) * H_)
-
-            A = 0
-            pv_reached = False
-            while not pv_reached:
-                A += A_increment
-                r_, H_, E_ = ic.r_h_e_linear(R=R, f=f, A=A, eps=eps, mu=mu_h(np.mean(abs(H_))))
-                complex_flux_ic = integrate_2d_axi_symmetry_field(r_, mu_h(abs(H_)) * H_)
-
-                pv_mag_ic = f_pv_mag(f, mu_h(abs(H_)).imag, np.abs(H_))
-                pv_el_ic = f_pv_el(f, eps.imag, np.abs(E_))
-                mean_pv_ic = (
-                    integrate_2d_axi_symmetry_field(r_, pv_mag_ic) +
-                    integrate_2d_axi_symmetry_field(r_, pv_el_ic)
-                ) / (np.pi * R**2)
-
-                if mean_pv_ic > pv_limit:
-                    pv_reached = True
-                PF_dim_f_op = 2 * np.pi * f * abs(complex_flux_ic)
-                b_mean_dim_f_op = abs(complex_flux_ic) / (np.pi * R**2)
-
-            PF_dim_f.append(PF_dim_f_op)
-            b_mean_dim_f.append(b_mean_dim_f_op)
-            print(f"      {A = } (IC)")
+            flux_ic = ic.flux_from_pv__non_linear(pv_limit, R, f, eps, mu_h)
+            PF_dim_f.append(2 * np.pi * f * abs(flux_ic))
+            b_mean_dim_f.append(abs(flux_ic) / np.pi / R**2)
 
         # append results for this radius
         PF_static_r.append(PF_static_f)
@@ -172,7 +150,7 @@ for material in materials:
     b_mean_dim.append(b_mean_dim_r)
 
 # -------------------------
-# Store Results (optimized structure)
+# Store Results
 # -------------------------
 results = {
     "temperature": T_c,
