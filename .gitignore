@@ -7,6 +7,6 @@ __pycache__/
 dimensional_performance_factor.egg-info
 
 # Files
-meta/folders.json
+meta/user_paths.json
 
 # General File Types
