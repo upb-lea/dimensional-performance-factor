@@ -1,6 +1,6 @@
 from scipy import special
-from utils.maths import *
-from utils.physics import *
+from dimensional_performance_factor.utils.maths import *
+from dimensional_performance_factor.utils.physics import *
 
 
 def r_h_e_linear(R, f, A, eps: complex, mu: complex, print_wavelength=False):

@@ -16,15 +16,16 @@ setup(
         'Programming Language :: Python :: 3.10',
         'Programming Language :: Python :: 3.11',
         'Programming Language :: Python :: 3.12',
+        'Programming Language :: Python :: 3.13',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: POSIX :: Linux',
         'Environment :: MacOS X'
     ],
     description="dimensional-performance-factor",
-    install_requires=['pandas~=2.2.1',
-                      'numpy~=1.26.0',
-                      'matplotlib~=3.8.0',
-                      'scipy~=1.12.0'
+    install_requires=['pandas~=2.2.3',
+                      'numpy~=2.1.0',
+                      'matplotlib~=3.9.2',
+                      'scipy~=1.14.1'
                       ],
     license="GNU General Public License v3",
 
@@ -33,7 +34,7 @@ setup(
     include_package_data=True,
     keywords='dimensional-performance-factor',
     name='dimensional-performance-factor',
-    packages=find_packages(include=['dimensional-performance-factor', 'dimensional-performance-factor.*']),
+    packages=find_packages(include=['dimensional_performance_factor', 'dimensional_performance_factor.*']),
     url='https://github.com/upb-lea/dimensional-performance-factor',
     project_urls={
         "Source Code": "https://github.com/upb-lea/dimensional-performance-factor",

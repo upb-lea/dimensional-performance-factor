@@ -1,8 +1,8 @@
 import pandas as pd
-from meta import paths
+from dimensional_performance_factor.meta import paths
 from scipy.optimize import curve_fit
-from utils.physics import *
-from utils.maths import *
+from dimensional_performance_factor.utils.physics import *
+from dimensional_performance_factor.utils.maths import *
 from scipy.interpolate import interp1d, griddata
 
 

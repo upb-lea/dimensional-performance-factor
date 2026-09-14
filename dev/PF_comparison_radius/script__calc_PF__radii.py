@@ -1,8 +1,8 @@
-from utils import infinite_cylinder as ic
-from utils import material_processing as materials
-from utils.physics import *
-from utils.maths import *
-from utils.general_functions import save_dict
+from dimensional_performance_factor.utils import infinite_cylinder as ic
+from dimensional_performance_factor.utils import material_processing as materials
+from dimensional_performance_factor.utils.physics import *
+from dimensional_performance_factor.utils.maths import *
+from dimensional_performance_factor.utils.general_functions import save_dict
 import logging
 import materialdatabase as mdb
 
